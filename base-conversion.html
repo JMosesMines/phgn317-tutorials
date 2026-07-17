@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Base Conversion Mastery</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --background: #f8f9fa;
+            --card-bg: #ffffff;
+            --success: #d4edda;
+            --success-border: #c3e6cb;
+            --success-text: #155724;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--background);
+        }
+
+        h1, h2, h3 { color: var(--primary); }
+        
+        .card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .highlight-box {
+            background-color: #e8f4f8;
+            border-left: 5px solid var(--secondary);
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        select, button {
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            outline: none;
+        }
+
+        button {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        button:hover { background-color: #2980b9; }
+        
+        button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        #problem-statement {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        th, td {
+            border: 1px solid #e0e0e0;
+            padding: 12px;
+            text-align: center;
+        }
+
+        th { background-color: #f5f6fa; font-weight: 600; }
+        
+        tr:nth-child(even) { background-color: #fafafa; }
+
+        .final-answer {
+            margin-top: 25px;
+            font-size: 1.3em;
+            background: var(--success);
+            color: var(--success-text);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid var(--success-border);
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <header class="card">
+        <h1>Understanding Number Systems</h1>
+        <p>Numbering systems use multiple digits to express any number through the use of a <strong>base</strong>. Each digit in a multi-digit number has a specific <strong>place value</strong>. This place value is determined by the base, raised to a power that corresponds to the digit's sequential position (starting from 0 on the right).</p>
+        
+        <p>We are most accustomed to the <strong>Decimal System</strong>, where the base is 10 and we use ten numeral symbols (0-9). In this application, we explore three other critical systems:</p>
+        <ul>
+            <li><strong>Binary (Base 2):</strong> Uses symbols 0 and 1.</li>
+            <li><strong>Octal (Base 8):</strong> Uses symbols 0 to 7.</li>
+            <li><strong>Hexadecimal (Base 16):</strong> Uses symbols 0-9 and A-F.</li>
+        </ul>
+
+        <p>These alternative systems—especially binary—are the foundation of digital electronics. They allow complex numerical data to be represented by the High/Low (or On/Off, 1/0) voltage values across a set of physical nodes in a computer's circuitry.</p>
+
+        <div class="highlight-box">
+            <h3>The Grouping Shortcut: Linking Binary to Octal and Hexadecimal</h3>
+            <p>You can quickly convert between binary and the octal or hexadecimal systems without ever calculating the decimal value. This is done by grouping binary digits:</p>
+            <ul>
+                <li><strong>For Octal:</strong> Group binary digits into sets of 3. Because 2<sup>3</sup> = 8, a 3-bit binary number has exactly 8 possible states (000 to 111). This maps perfectly, one-to-one, with the 8 symbols of the octal system (0 to 7).</li>
+                <li><strong>For Hexadecimal:</strong> Group binary digits into sets of 4. Because 2<sup>4</sup> = 16, a 4-bit binary number has exactly 16 possible states (0000 to 1111), mapping perfectly to the 16 symbols of hexadecimal (0 to F).</li>
+            </ul>
+        </div>
+    </header>
+
+    <main class="card">
+        <h2>Practice Area</h2>
+        <p>Select a conversion type and generate a problem to test your skills. Request the solution to see a step-by-step breakdown.</p>
+        
+        <div class="controls">
+            <select id="conversion-type">
+                <option value="dec-to-bin">Decimal to Binary</option>
+                <option value="dec-to-oct">Decimal to Octal</option>
+                <option value="dec-to-hex">Decimal to Hexadecimal</option>
+                <option value="bin-to-dec">Binary to Decimal</option>
+                <option value="bin-to-oct">Binary to Octal (Grouping)</option>
+                <option value="bin-to-hex">Binary to Hexadecimal (Grouping)</option>
+            </select>
+            <button onclick="generateProblem()">Generate Problem</button>
+            <button id="btn-solution" onclick="showSolution()" disabled>Reveal Solution</button>
+        </div>
+
+        <div id="problem-area" class="hidden">
+            <div id="problem-statement"></div>
+            <div id="solution-area" class="hidden"></div>
+        </div>
+    </main>
+
+    <script>
+        let currentProblem = null;
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generateProblem() {
+            const type = document.getElementById('conversion-type').value;
+            const problemArea = document.getElementById('problem-area');
+            const statement = document.getElementById('problem-statement');
+            const solutionArea = document.getElementById('solution-area');
+            const btnSolution = document.getElementById('btn-solution');
+
+            solutionArea.innerHTML = '';
+            solutionArea.classList.add('hidden');
+            problemArea.classList.remove('hidden');
+            btnSolution.disabled = false;
+
+            let num, fromBase, toBase, questionText;
+
+            switch(type) {
+                case 'dec-to-bin':
+                    num = getRandomInt(15, 255);
+                    currentProblem = { num: num, type: type, from: 10, to: 2 };
+                    questionText = `Convert the Decimal number ${num} to Binary.`;
+                    break;
+                case 'dec-to-oct':
+                    num = getRandomInt(15, 1024);
+                    currentProblem = { num: num, type: type, from: 10, to: 8 };
+                    questionText = `Convert the Decimal number ${num} to Octal.`;
+                    break;
+                case 'dec-to-hex':
+                    num = getRandomInt(100, 4096);
+                    currentProblem = { num: num, type: type, from: 10, to: 16 };
+                    questionText = `Convert the Decimal number ${num} to Hexadecimal.`;
+                    break;
+                case 'bin-to-dec':
+                    num = getRandomInt(15, 255).toString(2);
+                    currentProblem = { num: num, type: type, from: 2, to: 10 };
+                    questionText = `Convert the Binary number ${num} to Decimal.`;
+                    break;
+                case 'bin-to-oct':
+                    num = getRandomInt(15, 1024).toString(2);
+                    currentProblem = { num: num, type: type, from: 2, to: 8 };
+                    questionText = `Convert the Binary number ${num} to Octal using the 3-bit grouping method.`;
+                    break;
+                case 'bin-to-hex':
+                    num = getRandomInt(100, 4096).toString(2);
+                    currentProblem = { num: num, type: type, from: 2, to: 16 };
+                    questionText = `Convert the Binary number ${num} to Hexadecimal using the 4-bit grouping method.`;
+                    break;
+            }
+
+            statement.innerHTML = questionText;
+        }
+
+        function showSolution() {
+            const solutionArea = document.getElementById('solution-area');
+            solutionArea.innerHTML = '';
+            solutionArea.classList.remove('hidden');
+            document.getElementById('btn-solution').disabled = true;
+
+            const type = currentProblem.type;
+            
+            if (type === 'dec-to-bin' || type === 'dec-to-oct' || type === 'dec-to-hex') {
+                renderDivisionMethod(currentProblem.num, currentProblem.to, solutionArea);
+            } else if (type === 'bin-to-dec') {
+                renderPositionalMethod(currentProblem.num, solutionArea);
+            } else if (type === 'bin-to-oct') {
+                renderGroupingMethod(currentProblem.num, 8, 3, solutionArea);
+            } else if (type === 'bin-to-hex') {
+                renderGroupingMethod(currentProblem.num, 16, 4, solutionArea);
+            }
+        }
+
+        function renderDivisionMethod(num, base, container) {
+            let html = `<h3>Step-by-Step: Repeated Division by ${base}</h3>`;
+            html += `<p>Divide the number by the target base (${base}). Keep track of the quotient and the remainder. The remainders, read from bottom to top, form your final answer.</p>`;
+            html += `<table><tr><th>Operation</th><th>Quotient</th><th>Remainder</th><th>Symbol</th></tr>`;
+            
+            let current = num;
+            let remainders = [];
+            
+            while(current > 0) {
+                let remainder = current % base;
+                let quotient = Math.floor(current / base);
+                let symbol = remainder.toString(base).toUpperCase();
+                remainders.push(symbol);
+                
+                html += `<tr>
+                            <td>${current} &divide; ${base}</td>
+                            <td>${quotient}</td>
+                            <td>${remainder}</td>
+                            <td><strong>${symbol}</strong></td>
+                         </tr>`;
+                current = quotient;
+            }
+            
+            html += `</table>`;
+            let finalAnswer = remainders.reverse().join('');
+            html += `<div class="final-answer">Final Answer: ${finalAnswer}<sub>${base}</sub></div>`;
+            container.innerHTML = html;
+        }
+
+        function renderPositionalMethod(binStr, container) {
+            let html = `<h3>Step-by-Step: Positional Values</h3>`;
+            html += `<p>Multiply each digit by 2 raised to the power of its position (starting with 0 on the far right), then sum the results.</p>`;
+            html += `<table><tr><th>Digit</th><th>Position</th><th>Weight (2<sup>Position</sup>)</th><th>Value (Digit &times; Weight)</th></tr>`;
+            
+            let total = 0;
+            let length = binStr.length;
+            
+            for(let i = 0; i < length; i++) {
+                let digit = parseInt(binStr[i]);
+                let position = length - 1 - i;
+                let weight = Math.pow(2, position);
+                let value = digit * weight;
+                total += value;
+                
+                html += `<tr>
+                            <td>${digit}</td>
+                            <td>${position}</td>
+                            <td>2<sup>${position}</sup> = ${weight}</td>
+                            <td>${digit} &times; ${weight} = <strong>${value}</strong></td>
+                         </tr>`;
+            }
+            
+            html += `</table>`;
+            html += `<div class="final-answer">Final Answer (Sum of Values): ${total}<sub>10</sub></div>`;
+            container.innerHTML = html;
+        }
+
+        function renderGroupingMethod(binStr, targetBase, groupSize, container) {
+            let systemName = targetBase === 8 ? 'Octal' : 'Hexadecimal';
+            let html = `<h3>Step-by-Step: ${groupSize}-Bit Grouping (${systemName})</h3>`;
+            html += `<p>Starting from the right, separate the binary number into groups of ${groupSize} bits. Pad the leftmost group with leading zeros if necessary. Then, convert each group directly to its base ${targetBase} equivalent.</p>`;
+            
+            // Pad string to multiple of groupSize
+            let paddedBin = binStr;
+            while(paddedBin.length % groupSize !== 0) {
+                paddedBin = "0" + paddedBin;
+            }
+
+            html += `<table><tr><th>${groupSize}-Bit Group</th><th>Decimal Value</th><th>Base ${targetBase} Symbol</th></tr>`;
+            
+            let finalAnswer = '';
+            for(let i = 0; i < paddedBin.length; i += groupSize) {
+                let chunk = paddedBin.substring(i, i + groupSize);
+                let decValue = parseInt(chunk, 2);
+                let baseSymbol = decValue.toString(targetBase).toUpperCase();
+                finalAnswer += baseSymbol;
+                
+                html += `<tr>
+                            <td>${chunk}</td>
+                            <td>${decValue}</td>
+                            <td><strong>${baseSymbol}</strong></td>
+                         </tr>`;
+            }
+            
+            html += `</table>`;
+            html += `<div class="final-answer">Final Answer: ${finalAnswer}<sub>${targetBase}</sub></div>`;
+            container.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
