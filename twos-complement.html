@@ -130,7 +130,7 @@
         <h1>Understanding Two's Complement</h1>
         <p>In standard binary, we can only represent positive numbers. To represent negative numbers, digital systems use the <strong>Two's Complement</strong> framework. This is an elegant design because it allows standard arithmetic hardware to handle addition and subtraction identically without needing separate subtractor circuits.</p>
         
-        <p>In a signed 8-bit system, the absolute far-left bit (Most Significant Bit, or MSB) becomes the <strong>sign bit</strong>. Instead of representing a positive value ($+128$), it represents a negative value ($-128$).</p>
+        <p>In a signed 8-bit system, the absolute far-left bit (Most Significant Bit, or MSB) becomes the <strong>sign bit</strong>. Instead of representing a positive value (+128), it represents a negative value (-128).</p>
 
         <div class="highlight-box">
             <h3>The Recipe for Negative Numbers</h3>
@@ -206,7 +206,7 @@
             let num, questionText;
 
             if (type === 'dec-to-twos') {
-                num = getRandomInt(-128, -1); // Generating purely negative values for targeted practice
+                num = getRandomInt(-128, -1);
                 currentProblem = { num: num, type: type };
                 questionText = `Convert the signed Decimal number <span style="color:#e67e22;">${num}</span> to an 8-Bit Two's Complement binary sequence.`;
             } else {
@@ -241,7 +241,7 @@
             let html = `<h3>Step-by-Step Conversion</h3>`;
             html += `<table>
                         <tr><th>Step</th><th>Description</th><th>Value</th></tr>
-                        <tr><td>1</td><td>Find absolute value and pad to 8 bits</td><td class="binary-text">${posBin} (+$ {absVal})</td></tr>
+                        <tr><td>1</td><td>Find absolute value and pad to 8 bits</td><td class="binary-text">${posBin} (+${absVal})</td></tr>
                         <tr><td>2</td><td>Invert all bits (One's Complement)</td><td class="binary-text">${invertedBin}</td></tr>
                         <tr><td>3</td><td>Add 1 to the sequence</td><td class="binary-text">+ 00000001</td></tr>
                      </table>`;
