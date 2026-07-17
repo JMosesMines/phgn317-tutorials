@@ -150,8 +150,10 @@
         <div class="controls">
             <select id="conversion-type">
                 <option value="dec-to-bin">Decimal to Binary</option>
+                <option value="dec-to-oct">Decimal to Octal</option>
                 <option value="dec-to-hex">Decimal to Hexadecimal</option>
                 <option value="bin-to-dec">Binary to Decimal</option>
+                <option value="bin-to-oct">Binary to Octal (Grouping)</option>
                 <option value="bin-to-hex">Binary to Hexadecimal (Grouping)</option>
             </select>
             <button onclick="generateProblem()">Generate Problem</button>
@@ -191,8 +193,13 @@
                     currentProblem = { num: num, type: type, from: 10, to: 2 };
                     questionText = `Convert the Decimal number ${num} to Binary.`;
                     break;
+                case 'dec-to-oct':
+                    num = getRandomInt(15, 1024);
+                    currentProblem = { num: num, type: type, from: 10, to: 8 };
+                    questionText = `Convert the Decimal number ${num} to Octal.`;
+                    break;
                 case 'dec-to-hex':
-                    num = getRandomInt(100, 4000);
+                    num = getRandomInt(100, 4096);
                     currentProblem = { num: num, type: type, from: 10, to: 16 };
                     questionText = `Convert the Decimal number ${num} to Hexadecimal.`;
                     break;
@@ -201,8 +208,13 @@
                     currentProblem = { num: num, type: type, from: 2, to: 10 };
                     questionText = `Convert the Binary number ${num} to Decimal.`;
                     break;
+                case 'bin-to-oct':
+                    num = getRandomInt(15, 1024).toString(2);
+                    currentProblem = { num: num, type: type, from: 2, to: 8 };
+                    questionText = `Convert the Binary number ${num} to Octal using the 3-bit grouping method.`;
+                    break;
                 case 'bin-to-hex':
-                    num = getRandomInt(50, 4000).toString(2);
+                    num = getRandomInt(100, 4096).toString(2);
                     currentProblem = { num: num, type: type, from: 2, to: 16 };
                     questionText = `Convert the Binary number ${num} to Hexadecimal using the 4-bit grouping method.`;
                     break;
@@ -219,12 +231,14 @@
 
             const type = currentProblem.type;
             
-            if (type === 'dec-to-bin' || type === 'dec-to-hex') {
+            if (type === 'dec-to-bin' || type === 'dec-to-oct' || type === 'dec-to-hex') {
                 renderDivisionMethod(currentProblem.num, currentProblem.to, solutionArea);
             } else if (type === 'bin-to-dec') {
                 renderPositionalMethod(currentProblem.num, solutionArea);
+            } else if (type === 'bin-to-oct') {
+                renderGroupingMethod(currentProblem.num, 8, 3, solutionArea);
             } else if (type === 'bin-to-hex') {
-                renderGroupingMethod(currentProblem.num, solutionArea);
+                renderGroupingMethod(currentProblem.num, 16, 4, solutionArea);
             }
         }
 
@@ -285,34 +299,35 @@
             container.innerHTML = html;
         }
 
-        function renderGroupingMethod(binStr, container) {
-            let html = `<h3>Step-by-Step: 4-Bit Grouping</h3>`;
-            html += `<p>Starting from the right, separate the binary number into groups of 4 bits. Pad the leftmost group with leading zeros if necessary. Then, convert each 4-bit group directly to its hexadecimal equivalent.</p>`;
+        function renderGroupingMethod(binStr, targetBase, groupSize, container) {
+            let systemName = targetBase === 8 ? 'Octal' : 'Hexadecimal';
+            let html = `<h3>Step-by-Step: ${groupSize}-Bit Grouping (${systemName})</h3>`;
+            html += `<p>Starting from the right, separate the binary number into groups of ${groupSize} bits. Pad the leftmost group with leading zeros if necessary. Then, convert each group directly to its base ${targetBase} equivalent.</p>`;
             
-            // Pad string to multiple of 4
+            // Pad string to multiple of groupSize
             let paddedBin = binStr;
-            while(paddedBin.length % 4 !== 0) {
+            while(paddedBin.length % groupSize !== 0) {
                 paddedBin = "0" + paddedBin;
             }
 
-            html += `<table><tr><th>4-Bit Group</th><th>Decimal Value</th><th>Hexadecimal Symbol</th></tr>`;
+            html += `<table><tr><th>${groupSize}-Bit Group</th><th>Decimal Value</th><th>Base ${targetBase} Symbol</th></tr>`;
             
             let finalAnswer = '';
-            for(let i = 0; i < paddedBin.length; i += 4) {
-                let chunk = paddedBin.substring(i, i + 4);
+            for(let i = 0; i < paddedBin.length; i += groupSize) {
+                let chunk = paddedBin.substring(i, i + groupSize);
                 let decValue = parseInt(chunk, 2);
-                let hexSymbol = decValue.toString(16).toUpperCase();
-                finalAnswer += hexSymbol;
+                let baseSymbol = decValue.toString(targetBase).toUpperCase();
+                finalAnswer += baseSymbol;
                 
                 html += `<tr>
                             <td>${chunk}</td>
                             <td>${decValue}</td>
-                            <td><strong>${hexSymbol}</strong></td>
+                            <td><strong>${baseSymbol}</strong></td>
                          </tr>`;
             }
             
             html += `</table>`;
-            html += `<div class="final-answer">Final Answer: ${finalAnswer}<sub>16</sub></div>`;
+            html += `<div class="final-answer">Final Answer: ${finalAnswer}<sub>${targetBase}</sub></div>`;
             container.innerHTML = html;
         }
     </script>
