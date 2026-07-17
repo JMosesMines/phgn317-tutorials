@@ -124,14 +124,18 @@
         <h1>Understanding Number Systems</h1>
         <p>Numbering systems use multiple digits to express any number through the use of a <strong>base</strong>. Each digit in a multi-digit number has a specific <strong>place value</strong>. This place value is determined by the base, raised to a power that corresponds to the digit's sequential position (starting from 0 on the right).</p>
         
-        <p>We are most accustomed to the <strong>Decimal System</strong>, where the base is 10 and we use ten numeral symbols (0-9). In this application, we explore three other critical systems:</p>
+        <p>We are most accustomed to the <strong>Decimal System</strong>, where the base is 10 and we use ten numeral symbols (0-9). In this application, we explore alternative standard frameworks along with specialized mapping formats:</p>
         <ul>
             <li><strong>Binary (Base 2):</strong> Uses symbols 0 and 1.</li>
             <li><strong>Octal (Base 8):</strong> Uses symbols 0 to 7.</li>
             <li><strong>Hexadecimal (Base 16):</strong> Uses symbols 0-9 and A-F.</li>
+            <li><strong>Binary Coded Decimal (BCD):</strong> A specialized digital format where each individual digit of a decimal number is converted into its own distinct 4-bit binary sequence.</li>
         </ul>
 
-        <p>These alternative systems—especially binary—are the foundation of digital electronics. They allow complex numerical data to be represented by the High/Low (or On/Off, 1/0) voltage values across a set of physical nodes in a computer's circuitry.</p>
+        <div class="highlight-box">
+            <h3>Straight Binary vs. Binary Coded Decimal (BCD)</h3>
+            <p>It is vital not to confuse straight binary with BCD. Straight binary treats the entire number as a single entity based on increasing powers of 2. BCD completely ignores global positional weight. Instead, it breaks a decimal number down digit-by-digit, transforming each character into a 4-bit block. This makes it highly efficient for hardware components that drive independent digital readouts, such as seven-segment display clocks or calculators.</p>
+        </div>
 
         <div class="highlight-box">
             <h3>The Grouping Shortcut: Linking Binary to Octal and Hexadecimal</h3>
@@ -152,9 +156,11 @@
                 <option value="dec-to-bin">Decimal to Binary</option>
                 <option value="dec-to-oct">Decimal to Octal</option>
                 <option value="dec-to-hex">Decimal to Hexadecimal</option>
+                <option value="dec-to-bcd">Decimal to BCD</option>
                 <option value="bin-to-dec">Binary to Decimal</option>
                 <option value="bin-to-oct">Binary to Octal (Grouping)</option>
                 <option value="bin-to-hex">Binary to Hexadecimal (Grouping)</option>
+                <option value="bcd-to-dec">BCD to Decimal</option>
             </select>
             <button onclick="generateProblem()">Generate Problem</button>
             <button id="btn-solution" onclick="showSolution()" disabled>Reveal Solution</button>
@@ -185,7 +191,7 @@
             problemArea.classList.remove('hidden');
             btnSolution.disabled = false;
 
-            let num, fromBase, toBase, questionText;
+            let num, questionText;
 
             switch(type) {
                 case 'dec-to-bin':
@@ -203,6 +209,11 @@
                     currentProblem = { num: num, type: type, from: 10, to: 16 };
                     questionText = `Convert the Decimal number ${num} to Hexadecimal.`;
                     break;
+                case 'dec-to-bcd':
+                    num = getRandomInt(10, 999);
+                    currentProblem = { num: num, type: type };
+                    questionText = `Convert the Decimal number ${num} to Binary Coded Decimal (BCD).`;
+                    break;
                 case 'bin-to-dec':
                     num = getRandomInt(15, 255).toString(2);
                     currentProblem = { num: num, type: type, from: 2, to: 10 };
@@ -217,6 +228,12 @@
                     num = getRandomInt(100, 4096).toString(2);
                     currentProblem = { num: num, type: type, from: 2, to: 16 };
                     questionText = `Convert the Binary number ${num} to Hexadecimal using the 4-bit grouping method.`;
+                    break;
+                case 'bcd-to-dec':
+                    let baseDec = getRandomInt(10, 999);
+                    num = baseDec.toString().split('').map(d => parseInt(d).toString(2).padStart(4, '0')).join(' ');
+                    currentProblem = { num: num, type: type, target: baseDec };
+                    questionText = `Convert the BCD sequence ${num} to a Decimal number.`;
                     break;
             }
 
@@ -239,6 +256,10 @@
                 renderGroupingMethod(currentProblem.num, 8, 3, solutionArea);
             } else if (type === 'bin-to-hex') {
                 renderGroupingMethod(currentProblem.num, 16, 4, solutionArea);
+            } else if (type === 'dec-to-bcd') {
+                renderDecToBCD(currentProblem.num, solutionArea);
+            } else if (type === 'bcd-to-dec') {
+                renderBCDToDec(currentProblem.num, currentProblem.target, solutionArea);
             }
         }
 
@@ -304,7 +325,6 @@
             let html = `<h3>Step-by-Step: ${groupSize}-Bit Grouping (${systemName})</h3>`;
             html += `<p>Starting from the right, separate the binary number into groups of ${groupSize} bits. Pad the leftmost group with leading zeros if necessary. Then, convert each group directly to its base ${targetBase} equivalent.</p>`;
             
-            // Pad string to multiple of groupSize
             let paddedBin = binStr;
             while(paddedBin.length % groupSize !== 0) {
                 paddedBin = "0" + paddedBin;
@@ -328,6 +348,48 @@
             
             html += `</table>`;
             html += `<div class="final-answer">Final Answer: ${finalAnswer}<sub>${targetBase}</sub></div>`;
+            container.innerHTML = html;
+        }
+
+        function renderDecToBCD(num, container) {
+            let html = `<h3>Step-by-Step: Decimal to BCD Conversion</h3>`;
+            html += `<p>Isolate each individual decimal digit and transform it independently into its direct 4-bit binary equivalent.</p>`;
+            html += `<table><tr><th>Decimal Digit</th><th>4-Bit Binary Conversion</th></tr>`;
+            
+            let digits = num.toString().split('');
+            let bcdArray = [];
+            
+            digits.forEach(digit => {
+                let binaryValue = parseInt(digit).toString(2).padStart(4, '0');
+                bcdArray.push(binaryValue);
+                html += `<tr>
+                            <td><span style="font-size:1.2em; font-weight:bold;">${digit}</span></td>
+                            <td><strong style="font-family:monospace; font-size:1.2em;">${binaryValue}</strong></td>
+                         </tr>`;
+            });
+            
+            html += `</table>`;
+            html += `<div class="final-answer">Final BCD Answer: ${bcdArray.join(' ')}<sub>BCD</sub></div>`;
+            container.innerHTML = html;
+        }
+
+        function renderBCDToDec(bcdStr, targetDec, container) {
+            let html = `<h3>Step-by-Step: BCD to Decimal Conversion</h3>`;
+            html += `<p>Examine each distinct 4-bit binary block independently and convert its individual value back into a singular decimal digit.</p>`;
+            html += `<table><tr><th>4-Bit BCD Group</th><th>Evaluated Decimal Digit</th></tr>`;
+            
+            let groups = bcdStr.split(' ');
+            
+            groups.forEach(group => {
+                let decValue = parseInt(group, 2);
+                html += `<tr>
+                            <td><span style="font-family:monospace; font-size:1.2em;">${group}</span></td>
+                            <td><strong style="font-size:1.2em;">${decValue}</strong></td>
+                         </tr>`;
+            });
+            
+            html += `</table>`;
+            html += `<div class="final-answer">Final Decimal Answer: ${targetDec}<sub>10</sub></div>`;
             container.innerHTML = html;
         }
     </script>
