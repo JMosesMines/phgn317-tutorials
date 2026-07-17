@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logic Gates & Boolean Algebra</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #16a085;
+            --background: #f8f9fa;
+            --card-bg: #ffffff;
+            --success: #d4edda;
+            --success-border: #c3e6cb;
+            --success-text: #155724;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--background);
+        }
+
+        h1, h2, h3 { color: var(--primary); }
+        
+        .card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .highlight-box {
+            background-color: #e8f8f5;
+            border-left: 5px solid var(--secondary);
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        select, button {
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            outline: none;
+        }
+
+        button {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        button:hover { background-color: #117a65; }
+        
+        button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        #problem-statement {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        th, td {
+            border: 1px solid #e0e0e0;
+            padding: 12px;
+            text-align: center;
+        }
+
+        th { background-color: #f5f6fa; font-weight: 600; }
+        
+        tr:nth-child(even) { background-color: #fafafa; }
+
+        .gate-svg {
+            background: #fff;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .final-answer {
+            margin-top: 25px;
+            font-size: 1.3em;
+            background: var(--success);
+            color: var(--success-text);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid var(--success-border);
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <header class="card">
+        <h1>Understanding Digital Logic Gates</h1>
+        <p>Logic gates are the physical structural building blocks of integrated digital circuits. They execute fundamental <strong>Boolean algebra</strong> functions on one or more binary inputs to generate a singular binary output value.</p>
+        
+        <h3>Core Hardware Gate Profiles</h3>
+        <table>
+            <tr>
+                <th>Gate</th>
+                <th>Schematic Symbol</th>
+                <th>Boolean Expression</th>
+                <th>Functional Rule</th>
+            </tr>
+            <tr>
+                <td><strong>AND</strong></td>
+                <td>
+                    <svg class="gate-svg" width="60" height="30" viewBox="0 0 60 30">
+                        <path d="M10,5 H25 A10,10 0 0,1 35,15 A10,10 0 0,1 25,25 H10 Z" fill="none" stroke="#2c3e50" stroke-width="2"/>
+                        <line x1="0" y1="10" x2="10" y2="10" stroke="#2c3e50" stroke-width="2"/>
+                        <line x1="0" y1="20" x2="10" y2="20" stroke="#2c3e50" stroke-width="2"/>
+                        <line x1="35" y1="15" x2="55" y2="15" stroke="#2c3e50" stroke-width="2"/>
+                    </svg>
+                </td>
+                <td>Y = A &middot; B</td>
+                <td>Output is 1 only if ALL inputs are 1.</td>
+            </tr>
+            <tr>
+                <td><strong>OR</strong></td>
+                <td>
+                    <svg class="gate-svg" width="60" height="30" viewBox="0 0 60 30">
+                        <path d="M10,5 Q20,15 10,25 Q28,25 38,15 Q28,5 10,5 Z" fill="none" stroke="#2c3e50" stroke-width="2"/>
+                        <line x1="0" y1="10" x2="14" y2="10" stroke="#2c3e50" stroke-width="2"/>
+                        <line x1="0" y1="20" x2="14" y2="20" stroke="#2c3e50" stroke-width="2"/>
+                        <line x1="38" y1="15" x2="55" y2="15" stroke="#2c3e50" stroke-width="2"/>
+                    </svg>
+                </td>
+                <td>Y = A + B</td>
+                <td>Output is 1 if AT LEAST ONE input is 1.</td>
+            </tr>
+            <tr>
+                <td><strong>NOT</strong></td>
+                <td>
+                    <svg class="gate-svg" width="60" height="30" viewBox="0 0 60 30">
+                        <polygon points="15,5 30,15 15,25" fill="none" stroke="#2c3e50" stroke-width="2"/>
+                        <circle cx="33" cy="15" r="3" fill="none" stroke="#2c3e50" stroke-width="2"/>
+                        <line x1="0" y1="15" x2="15" y2="15" stroke="#2c3e50" stroke-width="2"/>
+                        <line x1="36" y1="15" x2="55" y2="15" stroke="#2c3e50" stroke-width="2"/>
+                    </svg>
+                </td>
+                <td>Y = A'</td>
+                <td>Inverts the input value completely.</td>
+            </tr>
+        </table>
+
+        <div class="highlight-box">
+            <h3>Derived Gates (NAND, NOR, XOR)</h3>
+            <p>Placing an inversion bubble at the output node creates <strong>NAND</strong> and <strong>NOR</strong> gates, which flip the default results of AND and OR. The <strong>XOR (Exclusive OR)</strong> gate is unique: its output goes high if the inputs are different, but drops to low if both inputs match.</p>
+        </div>
+    </header>
+
+    <main class="card">
+        <h2>Practice Area</h2>
+        <p>Test your structural understanding of truth tables and hardware response states.</p>
+        
+        <div class="controls">
+            <select id="conversion-type">
+                <option value="predict-output">Predict Gate Output Condition</option>
+                <option value="identify-gate">Identify Gate from Truth Table</option>
+            </select>
+            <button onclick="generateProblem()">Generate Problem</button>
+            <button id="btn-solution" onclick="showSolution()" disabled>Reveal Solution</button>
+        </div>
+
+        <div id="problem-area" class="hidden">
+            <div id="problem-statement"></div>
+            <div id="solution-area" class="hidden"></div>
+        </div>
+    </main>
+
+    <script>
+        let currentProblem = null;
+        const gates = {
+            'AND':  { expr: 'A &middot; B',  calc: (a, b) => a && b },
+            'OR':   { expr: 'A + B',         calc: (a, b) => a || b },
+            'NAND': { expr: '(A &middot; B)\'', calc: (a, b) => !(a && b) ? 1 : 0 },
+            'NOR':  { expr: '(A + B)\'',     calc: (a, b) => !(a || b) ? 1 : 0 },
+            'XOR':  { expr: 'A &oplus; B',   calc: (a, b) => a !== b ? 1 : 0 }
+        };
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generateProblem() {
+            const type = document.getElementById('conversion-type').value;
+            const problemArea = document.getElementById('problem-area');
+            const statement = document.getElementById('problem-statement');
+            const solutionArea = document.getElementById('solution-area');
+            const btnSolution = document.getElementById('btn-solution');
+
+            solutionArea.innerHTML = '';
+            solutionArea.classList.add('hidden');
+            problemArea.classList.remove('hidden');
+            btnSolution.disabled = false;
+
+            const gateKeys = Object.keys(gates);
+            const chosenGate = gateKeys[getRandomInt(0, gateKeys.length - 1)];
+
+            if (type === 'predict-output') {
+                const inputA = getRandomInt(0, 1);
+                const inputB = getRandomInt(0, 1);
+                currentProblem = { type, gate: chosenGate, a: inputA, b: inputB };
+                statement.innerHTML = `An engineered logic circuit features a single <strong>${chosenGate}</strong> gate. If Input A = <span style="color:#16a085;">${inputA}</span> and Input B = <span style="color:#16a085;">${inputB}</span>, evaluate output state Y.`;
+            } else {
+                currentProblem = { type, gate: chosenGate };
+                statement.innerHTML = `Analyze the mystery truth table rendered below. Identify which hardware logic gate generates this explicit output sequence.`;
+                renderMysteryTable(chosenGate, problemArea);
+            }
+        }
+
+        function renderMysteryTable(gateName, container) {
+            let existingTable = document.getElementById('mystery-table-element');
+            if(existingTable) existingTable.remove();
+
+            let tableHtml = `<table id="mystery-table-element" style="margin-top:15px; width:50%;">
+                                <tr><th>Input A</th><th>Input B</th><th>Output Y</th></tr>`;
+            const states = [[0,0], [0,1], [1,0], [1,1]];
+            states.forEach(st => {
+                let out = gates[gateName].calc(st[0], st[1]) ? 1 : 0;
+                tableHtml += `<tr><td>${st[0]}</td><td>${st[1]}</td><td><strong>${out}</strong></td></tr>`;
+            });
+            tableHtml += `</table>`;
+            statement = document.getElementById('problem-statement');
+            statement.insertAdjacentHTML('afterend', tableHtml);
+        }
+
+        function showSolution() {
+            const solutionArea = document.getElementById('solution-area');
+            let existingTable = document.getElementById('mystery-table-element');
+            if(existingTable && currentProblem.type === 'predict-output') existingTable.remove();
+
+            solutionArea.innerHTML = '';
+            solutionArea.classList.remove('hidden');
+            document.getElementById('btn-solution').disabled = true;
+
+            if (currentProblem.type === 'predict-output') {
+                renderOutputSolution(currentProblem, solutionArea);
+            } else {
+                renderIdentitySolution(currentProblem.gate, solutionArea);
+            }
+        }
+
+        function renderOutputSolution(prob, container) {
+            const gateData = gates[prob.gate];
+            let ans = gateData.calc(prob.a, prob.b) ? 1 : 0;
+
+            let html = `<h3>Step-by-Step Circuit Trace</h3>`;
+            html += `<p>Let's map the structural inputs down into the functional rules of the <strong>${prob.gate}</strong> operation:</p>`;
+            html += `<table>
+                        <tr><th>Boolean Expression Structure</th><th>Substitution Evaluated</th><th>Final Evaluation</th></tr>
+                        <tr>
+                            <td>Y = ${gateData.expr}</td>
+                            <td>Y = ${prob.a} [Operation] ${prob.b}</td>
+                            <td>Y = <strong>${ans}</strong></td>
+                        </tr>
+                     </table>`;
+            html += `<div class="final-answer">Final Output State Y = ${ans}</div>`;
+            container.innerHTML = html;
+        }
+
+        function renderIdentitySolution(gateName, container) {
+            let html = `<h3>Truth Table Profiling Solution</h3>`;
+            html += `<p>Let's review the evaluation characteristics of the active truth table sequence:</p><ul>`;
+            
+            if(gateName === 'AND') html += `<li>The output drops to 1 exclusively when both inputs are pulled high. This corresponds to Boolean multiplication.</li>`;
+            if(gateName === 'OR') html += `<li>The output goes high if any positive signal line is triggered. This matches logical addition.</li>`;
+            if(gateName === 'NAND') html += `<li>The output remains uniformly locked at 1, except for the absolute high-input boundary state where it breaks down to 0. This is an inverted AND envelope.</li>`;
+            if(gateName === 'NOR') html += `<li>The output triggers to high only when the structural baseline rests fully at 0. This is an inverted OR envelope.</li>`;
+            if(gateName === 'XOR') html += `<li>The system output triggers cleanly when input states mismatch, dropping to 0 under uniform load conditions.</li>`;
+            
+            html += `</ul><div class="final-answer">Identified Gate Profile: ${gateName}</div>`;
+            container.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
