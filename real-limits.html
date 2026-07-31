@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-world limits</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="fonts.css">
+
+    <!-- Tell TikZJax where your assets are -->
+    <script>
+        window.TikZJaxConfig = {
+        assets: { wasm: 'tex.wasm.gz', core: 'core.dump.gz' }
+        };
+    </script>
+</head>
+
+<body>
+
+<header class="card">
+    <h1>Real-world limits</h1>
+    <h3>Fan-out</h3>
+    <p>How many gates can one gate drive?  This is the question of <strong>fan-out</strong>.  Ideally the limit would be infinite, but in practice it is not.  The maximum fan-out depends on the current driving capacity on the output side of a logic gate, and the current consumption requirements of the inputs.</p>
+    <figure class="media-container">
+        <div id="fan_out" class="tutorial-media" style="max-width: 250px;"></div>
+        <figcaption>Fan-out</a>
+        </span>
+        </figcaption>
+    </figure>
+    <h3>Propagation delay</h3>
+    <p><strong>Propagation delay</strong> is the time required for a signal change at a gate's input to result in a corresponding change at its output</p>
+    <figure class="media-container">
+        <div id="propagation_delay" class="tutorial-media" style="max-width: 250px;"></div>
+        <figcaption>Propagation delay</a>
+        </span>
+        </figcaption>
+    </figure>
+</header>
+<script>
+(async () => {
+    const circuits = [[
+        "\\draw (0,0) node[buffer gate US, draw] (D) {Driver};",
+        "\\draw (D.output) -- ++(1.5,0) coordinate (trunk);", 
+        "\\draw (trunk) ++(0, 3.0) -- (trunk) -- ++(0, -3.0);",
+        "\\draw (trunk) ++(0, 3.0) to[short, -o] ++(0.5,0) node[buffer gate US, anchor=input, draw, scale=0.8] (L1) {};",
+        "\\node[right] at (L1.east) {Load 1};",
+        "\\draw (trunk) ++(0, 1.0) to[short, -o] ++(0.5,0) node[buffer gate US, anchor=input, draw, scale=0.8] (L2) {};",
+        "\\node[right] at (L2.east) {Load 2};",
+        "\\draw (trunk) ++(0, -3.0) to[short, -o] ++(0.5,0) node[buffer gate US, anchor=input, draw, scale=0.8] (LN) {};",
+        "\\node[right] at (LN.east) {Load $N$};",
+        "\\node at (2.5, -1.0) {$\\vdots$};",
+        "\\node[right, font=\\small] at (2.8, -1.0) {Intermediate Loads};",
+        "\\node[above left] at ($(trunk)+(0, 3.1)$) {Fan-out $\\le$ Limit};"
+        ],[
+        "\\draw[thick] (0, 2) node[left] {A} -- (1, 2) -- (1, 3) -- (4, 3) -- (4, 2) -- (6, 2);",
+        "\\draw[thick, blue] (0, 0) node[left, black] {Y} -- (1.5, 0) -- (1.5, 1) -- (4.5, 1) -- (4.5, 0) -- (6, 0);",
+        "\\draw[dashed, gray] (1, 3) -- (1, -0.5);",
+        "\\draw[dashed, gray] (1.5, 1) -- (1.5, -0.5);",
+        "\\draw[dashed, gray] (4, 2) -- (4, -0.5);",
+        "\\draw[dashed, gray] (4.5, 0) -- (4.5, -0.5);",
+        "\\draw[<->, >=stealth] (1, -0.3) -- (1.5, -0.3) node[midway, below] {$t_{pLH}$};",
+        "\\draw[<->, >=stealth] (4, -0.3) -- (4.5, -0.3) node[midway, below] {$t_{pHL}$};",
+        "\\node[anchor=west] at (0, 4) {Timing Diagram: Input A vs. Delayed Output Y}; "           
+        ]];
+ 
+    const [tikz1, tikz2] = circuits.map(item => [
+    '\\usepackage{circuitikz}',
+    '\\begin{document}',
+    '\\begin{circuitikz}[american]',
+    '\\usetikzlibrary{shapes.gates.logic.US,calc}',
+    ...item,
+    '\\end{circuitikz}',
+    '\\end{document}'
+    ].join('\n'));
+    
+    // Inject TikZ first
+    const s1 = document.createElement('script');
+    s1.type = 'text/tikz';
+    s1.textContent = tikz1;
+    fan_out.appendChild(s1);
+    const s2 = document.createElement('script');
+    s2.type = 'text/tikz';
+    s2.textContent = tikz2;
+    propagation_delay.appendChild(s2);
+
+    // Then load tikzjax.js (autostart). Use a cache-buster so it executes each time.
+    const t = document.createElement('script');
+    t.src = 'tikzjax.js?cb=' + Date.now();
+    document.head.appendChild(t);
+
+})();
+
+</script>
+</header>
+
+<footer class="academic-footer">
+    <p>Developed by Josh Moses with engineering assistance from Google Gemini (July 2026).</p>
+</footer>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Gate Architectures</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="fonts.css">
+
+    <!-- Tell TikZJax where your assets are -->
+    <script>
+        window.TikZJaxConfig = {
+        assets: { wasm: 'tex.wasm.gz', core: 'core.dump.gz' }
+        };
+    </script>
+</head>
+<body>
+
+<header class="card">
+    <h1>Universal Gate Circuits</h1>
+    <p>It turns out that the NAND and NOR gates are <em>functionally complete</em>, in that any logical function can be implemented by combining only, one or more NAND gates, or one or more NOR gates.  This theorem is useful because standardizing on just one type of logic gate can leverage economies of scale by simplifying inventory.</p>
+</header>
+
+<main class="card">
+    <h2>Practice Area</h2>
+    <p>Generate a problem to test your skills. Request the solution when you are ready.</p>
+
+<div class="controls">
+    <button onclick="generateProblem()">Generate Problem</button>
+    <button id="btn-solution" onclick="showSolution()" disabled>Reveal Solution</button>
+</div>
+
+<div id="problem-area">
+    <div id="problem-statement"></div>
+    <div id="solution-area" class="hidden"></div>
+</div>
+</main>
+<footer class="academic-footer">
+    <p>Developed by Josh Moses with engineering assistance from Google Gemini (July 2026).</p>
+</footer>
+
+<script>
+    let currentProblem = null;
+
+    function getRandomInt(min, max) {
+         return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function generateProblem() {
+    //     const type = document.getElementById('conversion-type').value;
+         const problemArea = document.getElementById('problem-area');
+         const statement = document.getElementById('problem-statement');
+         const solutionArea = document.getElementById('solution-area');
+         const btnSolution = document.getElementById('btn-solution');
+
+         solutionArea.innerHTML = '';
+         solutionArea.classList.add('hidden');
+         problemArea.classList.remove('hidden');
+         btnSolution.disabled = false;
+
+         let num, questionText;
+   
+         num = getRandomInt(0,5);
+         currentProblem = {num: num};
+         questionMiddles = ["of an Inverter (NOT)", "AND", "OR"];
+         questionEnds = ["NAND gates.", "NOR gates."];
+         questionText = "Draw a schematic to show how the logic function " 
+            + questionMiddles[num%3]
+            + " can be constructed by combining one or more "
+            + questionEnds[Math.floor(num/3)];
+        statement.innerHTML = questionText;
+    }
+    function showSolution() {
+        const solutionArea = document.getElementById('solution-area');
+        solutionArea.innerHTML = '';
+        solutionArea.classList.remove('hidden');
+        document.getElementById('btn-solution').disabled = true;
+
+        renderCircuitSolution(currentProblem.num);
+    }
+
+(async () => {
+    const circuit = [[
+        "\\draw (0,0) node[nand gate US, draw, logic gate inputs=nn] (G1) {};",
+        "\\draw (G1.input 1) -- ++(-0.2,0) -- ++(0,-0.2) coordinate (join);",
+        "\\draw (G1.input 2) -- ++(-0.2,0) -- ++(0,0.2);",
+        "\\draw (join) to[short, -o] ++(-0.5,0) node[left] {A};",
+        "\\draw (G1.output) to[short, -o] ++(0.5,0) node[right] {$\\bar{A}$};"
+        ],[
+        "\\draw (0,0) node[nand gate US, draw, logic gate inputs=nn] (G1) {};",       
+        "\\draw (G1.input 1) -- ++(-0.2,0) -- ++(0, 0.4) to[short, -o] ++(-0.4,0) node[left] {A};",
+        "\\draw (G1.input 2) -- ++(-0.2,0) -- ++(0,-0.4) to[short, -o] ++(-0.4,0) node[left] {B};",
+        "\\draw (2.5,0) node[nand gate US, draw, logic gate inputs=nn] (G2) {};",
+        "\\draw (G1.output) -- ++(0.3,0) coordinate (branch) -- (G2.input 1);",
+        "\\draw (branch) |- (G2.input 2);",
+        "\\draw (G2.output) to[short, -o] ++(0.5,0) node[right] {A $\\cdot$ B};"         
+        ],[
+        "\\draw (0,1.5) node[nand gate US, draw, logic gate inputs=nn] (G1) {};",
+        "\\draw (G1.input 1) -- ++(-0.2,0) -- ++(0,-0.2) coordinate (joinA);",
+        "\\draw (G1.input 2) -- ++(-0.2,0) -- ++(0, 0.2);",
+        "\\draw (joinA) to[short, -o] ++(-0.5,0) node[left] {A};",
+        "\\draw (0,-1.5) node[nand gate US, draw, logic gate inputs=nn] (G2) {};",
+        "\\draw (G2.input 1) -- ++(-0.2,0) -- ++(0,-0.2) coordinate (joinB);",
+        "\\draw (G2.input 2) -- ++(-0.2,0) -- ++(0, 0.2);",
+        "\\draw (joinB) to[short, -o] ++(-0.5,0) node[left] {B};",
+        "\\draw (2.5,0) node[nand gate US, draw, logic gate inputs=nn] (G3) {};",
+        "\\draw (G1.output) -- ++(0.4,0) |- (G3.input 1);",
+        "\\draw (G2.output) -- ++(0.4,0) |- (G3.input 2);",
+        "\\draw (G3.output) to[short, -o] ++(0.5,0) node[right] {A + B};"
+        ],[
+        "\\draw (0,0) node[nor gate US, draw, logic gate inputs=nn] (G1) {};",
+        "\\draw (G1.input 1) -- ++(-0.2,0) -- ++(0,-0.2) coordinate (join);",
+        "\\draw (G1.input 2) -- ++(-0.2,0) -- ++(0, 0.2);",
+        "\\draw (join) to[short, -o] ++(-0.5,0) node[left] {A};",
+        "\\draw (G1.output) to[short, -o] ++(0.5,0) node[right] {$\\bar{A}$};"
+        ],[
+        "\\draw (0,1.5) node[nor gate US, draw, logic gate inputs=nn] (G1) {};",
+        "\\draw (G1.input 1) -- ++(-0.2,0) -- ++(0,-0.2) coordinate (joinA);",
+        "\\draw (G1.input 2) -- ++(-0.2,0) -- ++(0, 0.2);",
+        "\\draw (joinA) to[short, -o] ++(-0.5,0) node[left] {A};",
+        "\\draw (0,-1.5) node[nor gate US, draw, logic gate inputs=nn] (G2) {};",
+        "\\draw (G2.input 1) -- ++(-0.2,0) -- ++(0,-0.2) coordinate (joinB);",
+        "\\draw (G2.input 2) -- ++(-0.2,0) -- ++(0, 0.2);",
+        "\\draw (joinB) to[short, -o] ++(-0.5,0) node[left] {B};",
+        "\\draw (2.5,0) node[nor gate US, draw, logic gate inputs=nn] (G3) {};",
+        "\\draw (G1.output) -- ++(0.4,0) |- (G3.input 1);",
+        "\\draw (G2.output) -- ++(0.4,0) |- (G3.input 2);",
+        "\\draw (G3.output) to[short, -o] ++(0.5,0) node[right] {A $\\cdot$ B};"
+        ],[
+        "\\draw (0,0) node[nor gate US, draw, logic gate inputs=nn] (G1) {};",
+        "\\draw (G1.input 1) -- ++(-0.2,0) -- ++(0, 0.4) to[short, -o] ++(-0.4,0) node[left] {A};",
+        "\\draw (G1.input 2) -- ++(-0.2,0) -- ++(0,-0.4) to[short, -o] ++(-0.4,0) node[left] {B};",
+        "\\draw (2.5,0) node[nor gate US, draw, logic gate inputs=nn] (G2) {};",
+        "\\draw (G1.output) -- ++(0.3,0) coordinate (branch) -- (G2.input 1);",
+        "\\draw (branch) |- (G2.input 2);",
+        "\\draw (G2.output) to[short, -o] ++(0.5,0) node[right] {A + B};"
+        ]];
+
+function renderCircuitSolution(num) {
+    const tikz = [
+      '\\usepackage{circuitikz}',
+      '\\usetikzlibrary{shapes.gates.logic.US,calc}',
+      '\\begin{document}',
+      '\\begin{circuitikz}[american]',
+      ...circuit[num],
+      '\\end{circuitikz}',
+      '\\end{document}'
+    ].join('\n');
+    
+     const solutionArea = document.getElementById('solution-area');
+
+    // Clear prior content
+    solutionArea.innerHTML = '';
+
+    // Inject TikZ first
+    const s = document.createElement('script');
+    s.type = 'text/tikz';
+    s.textContent = tikz;
+    solutionArea.appendChild(s);
+
+    // Then load tikzjax.js (autostart). Use a cache-buster so it executes each time.
+    const t = document.createElement('script');
+    t.src = 'tikzjax.js?cb=' + Date.now();
+    document.head.appendChild(t);
+}
+    document.getElementById('btn-solution').addEventListener('click', () => {
+        renderCircuitSolution(currentProblem.num);
+    });
+})();
+</script>
+</body>
+</html>

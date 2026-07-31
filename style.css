@@ -122,6 +122,15 @@ body {
 
 h1, h2, h3 { color: var(--primary); }
 
+.tutorial-media {
+    max-width: 100%;       /* Ensures the GIF never overflows the card */
+    height: auto;          /* Maintains the original aspect ratio */
+    display: block;
+    margin: 0 auto;        /* Centers the image horizontally */
+    border-radius: 8px;    /* Matches your site's rounded card aesthetic */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle elevation */
+}
+
 .card {
     background: var(--card-bg);
     padding: 30px;
@@ -168,6 +177,19 @@ button:disabled {
     background-color: #AEB3B8;
     cursor: not-allowed;
 }
+
+/* Optional Figure Caption Styling */
+.media-container {
+    margin: 20px 0;
+    text-align: center;
+}
+
+figcaption {
+    font-size: 0.9em;
+    color: #7f8c8d;
+    margin-top: 8px;
+    font-style: italic;
+}       
 
 #problem-statement {
     font-size: 1.4em;

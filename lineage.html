@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transistors as switches</title>
+    <link rel="stylesheet" href="style.css">
+<body>
+<header class="card">
+    <h1>Architectural Lineage of TTL</h1>
+    <h3>Diode-Resistor Logic (DRL)</h3>
+    <p>It is possible to build some logic gates without any transistors, using just diodes and resistors.  Although DRL gates have significant disadvantages for general-purpose use, we do still occasionally use this architecture in some applications thanks to its simplicity.</p>
+
+    <h4>OR Gate</h4>
+    <p>If any input is High, its diode will conduct, and the output voltage will be High</p>
+    <p>If all inputs are Low, none of the diodes will conduct, and the pull-down resistor will pull the output voltage Low.</p>
+    <figure class="media-container">
+    <img src="images/Animated_wired_OR_diode_logic.gif" alt="Animated wired OR diode logic" class="tutorial-media" style="max-width: 400px;">
+    <figcaption>Diode-Resistor OR Gate
+        <span class="source-credit">
+        Source: <a href="https://en.wikipedia.org/wiki/Diode_logic#/media/File:Animated_wired_OR_diode_logic.gif" rel="noopener noreferrer" target="=_blank">Wikipedia</a>
+        </span>
+    </figcaption>
+    </figure>
+    <h4>AND Gate</h4>
+    <p>If any input is Low, its diode will conduct, and the output voltage will be Low</p>
+    <p>If all inputs are High, none of the diodes will conduct, and the pull-up resistor will pull the output voltage High.</p>
+    <figure class="media-container">
+    <img src="images/Animated_wired_AND_diode_logic.gif" alt="Animated wired AND diode logic" class="tutorial-media" style="max-width: 400px;">
+    <figcaption>Diode-Resistor AND Gate
+        <span class="source-credit">
+        Source: <a href="https://en.wikipedia.org/wiki/Diode_logic#/media/File:Animated_wired_AND_diode_logic.gif" rel="noopener noreferrer" target="=_blank">Wikipedia</a>
+        </span>
+    </figcaption>
+    </figure>
+    
+    <h3>Resistor-Transistor Logic (RTL)</h3>
+    <p>The first successful family of digital logic ICs was built in the 1960s using resistors and transistors.</p>
+    <h4>One-transistor RTL NOR Gate</h4>
+    <p>A single BJT can be wired as a NOR gate just by applying two or more input signals, each with its own resistor (R<sub>3</sub> and R<sub>4</sub> in this example), to the Base terminal of the BJT.  If any of the input signals is High, current flows into the Base and the transistor conducts, pulling the output signal Low.  If all of the input signals are low, the transistor turns off and the pullup resistor pulls the output High. </p>
+    <figure class="media-container">
+    <img src="images/RTL_NPN_NOR_Gate.svg" alt="One-transistor RTL NOR Gate" class="tutorial-media" style="max-width: 400px;">
+    <figcaption>One-transistor RTL NOR Gate
+        <span class="source-credit">
+        Source: <a href="https://en.wikipedia.org/wiki/Resistor%E2%80%93transistor_logic#/media/File:RTL_NPN_NOR_Gate.svg" rel="noopener noreferrer" target="=_blank">Wikipedia</a>
+        </span>
+    </figcaption>
+    </figure>
+    <h4>Multi-transistor RTL NOR Gate</h4>
+    <p>The one-transistor RTL gate works with only a limited number of input signals, but an unlimited number of input signals can be used, if each has its own transistor.  The circuit below is equivalant to the "wired NOR" gate, made from several <em>open collector</em> outputs wired together.</p>
+    <figure class="media-container">
+    <img src="images/RTL_3-Input_NOR_Gate.svg" alt="One-transistor RTL NOR Gate" class="tutorial-media" style="max-width: 600px;">
+    <figcaption>Multi-transistor RTL NOR Gate
+        <span class="source-credit">
+        Source: <a href="https://en.wikipedia.org/wiki/Resistor%E2%80%93transistor_logic#/media/File:RTL_3-Input_NOR_Gate.svg" rel="noopener noreferrer" target="=_blank">Wikipedia</a>
+        </span>
+    </figcaption>
+    </figure>
+
+    <h3>Diode-Transistor Logic (RTL)</h3>
+    <p>Diode-Transistor Logic gates combine the ideas of Diode-Resistor and Resistor-Transistor logic to form circuits like the active 2-input NAND Gate shown below.</p>
+    <figure class="media-container">
+    <img src="images/logic-log2.gif" alt="DTL NAND Gate" class="tutorial-media" style="max-width: 600px;">
+    <figcaption>2-input RTL NAND Gate
+        <span class="source-credit">
+        Source: <a href="https://www.electronics-tutorials.ws/logic/logic_1.html" rel="noopener noreferrer" target="=_blank">ElectronicsTutorials</a>
+        </span>
+    </figcaption>
+    </figure>
+
+   <h3>Emitter-Coupled Logic (ECL)</h3>
+   <p>In most digital circuits, the transistors only switch between Saturation and Cutoff Mode.  To reduce the switching time, Emitter-Coupled Logic (ECL) circuits use digital signals with BJT's operating in Active Mode.  Although it is fast, this technology is less popular because it consumes more power and is more susceptible to noise-induced errors.</p>
+   <p><strong>Transitor-Transistor Logic (TTL)</strong> turned out to be superior to the preceding architectures, for BJT-based Integrated Circuits, and then CMOS overtook TTL due to the important advantages of low power consumption and high speed.</p>
+
+
+</header>
+
+<footer class="academic-footer">
+    <p>Developed by Josh Moses with engineering assistance from Google Gemini (July 2026).</p>
+</footer>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="fonts.css">
+
+    <!-- Tell TikZJax where your assets are -->
+    <script>
+        window.TikZJaxConfig = {
+        assets: { wasm: 'tex.wasm.gz', core: 'core.dump.gz' }
+        };
+    </script>
+</head>
+<body>
+
+<header class="card">
+    <h1>Memory</h1>
+    <p>A block of computer memory consists of a 2-dimensional grid of flip-flops (or latches).  The width of the grid is <em>n</em>, the number of bits in each <strong>word</strong>, and the length is 2<sup>k</sup>, where <em>k</em> is the number of address bits.  Memory write and read actions are gated, on the input and output side of each flip-flop, by <strong>enable</strong> signals.  An address decoder inside the memory IC selects which word is to be written or read.</p>
+    <h3>Signal I/O</h3>
+    <figure class="media-container">
+        <div id="memory" class="tutorial-media" style="max-width: 600px;"></div>
+        <figcaption>Memory</a>
+        </span>
+        </figcaption>
+    </figure>
+    <h3>Timing sequence</h3>
+    <p>Memory operations must proceed in a certain sequence.  For a Write operation, the CPU sets the value of the Address and Data Input busses, and then activates and deactivates the Write Enable Signal, to latch the data into memory.  Then the busses are ready for the next operation.</p>
+    <figure class="media-container">
+        <div id="write_cycle" class="tutorial-media" style="max-width: 600px;"></div>
+        <figcaption>Write Cycle</a>
+        </span>
+        </figcaption>
+    </figure>
+    <p>For a Read operation, the CPU sets a value on the Address bus, and then activates the Read Enable signal.  The memory device then sets the value of the Data Output bus.  After reading the data, the controller then deactivates the Read Enable signal.  Then the busses are ready for the next operation</p>
+    <figure class="media-container">
+        <div id="read_cycle" class="tutorial-media" style="max-width: 600px;"></div>
+        <figcaption>Read Cycle</a>
+        </span>
+        </figcaption>
+    </figure>
+<script>
+(async () => {
+    const diagrams =[[
+        '\\begin{tikzpicture}[>=Stealth,font=\\sffamily,>=Latex, memory/.style={draw,line width=2pt,minimum width=3cm,minimum height=5cm,align=center}]',
+        '\\tikzset{ bus/.style={ draw, double, double distance=12pt, line width=1pt, >={Stealth[length=10mm,width=10mm,open]} }}',
+        '\\node[memory] (mem) at (0,0) {\\Large \\textbf{Memory}};',
+        '\\draw[bus,->] (-5.5, 1.5) -- node[midway,above=-8pt,xshift=-10pt]{\\normalsize \\emph{k} address lines} (-1.5, 1.5);',
+        '\\draw[->,thick] (-5, 0.5) -- (-1.5, 0.5) node[midway,above=-2pt,xshift=-10pt]{\\normalsize Read Enable};',
+        '\\draw[->,thick] (-5,-0.5) -- (-1.5,-0.5) node[midway,above=-2pt,xshift=-10pt]{\\normalsize Write Enable};',
+        '\\draw[bus,->] (-5.5, -1.5) -- node[above=-9pt,xshift=-10pt]{\\normalsize \\emph{n} data input lines} (-1.5, -1.5);',
+        '\\draw[bus,->] (1.5,-1.5) -- (5.5,-1.5) node[midway,above=-9pt,xshift=-10pt]{\\normalsize \\emph{n} data output lines};'
+        ],[
+        '\\begin{tikzpicture}[font=\\sffamily]',
+        '\\node[anchor=east] at (0,3) {\\large Address};',
+        '\\node[anchor=east] at (0,1.5) {\\large Data In};',
+        '\\node[anchor=east] at (0,0) {\\large $\\overline{\\mathrm{WE}}$};',
+        '\\draw (1,3.25)--(1.4,2.75)--(1.8,3.25)--(2.2,2.75)--(2.6,3.25);',
+        '\\draw (1,2.75)--(1.4,3.25)--(1.8,2.75)--(2.2,3.25)--(2.6,2.75);',
+        '\\draw (2.6,3.25)--(5.4,3.25);',
+        '\\draw (2.6,2.75)--(5.4,2.75);',
+        '\\node[fill=white] at (4,3) {\\scriptsize stable address};',
+        '\\draw (5.4,3.25)--(5.8,2.75)--(6.2,3.25)--(6.6,2.75)--(7,3.25);',
+        '\\draw (5.4,2.75)--(5.8,3.25)--(6.2,2.75)--(6.6,3.25)--(7,2.75);',
+        '\\draw (1,1.75)--(1.4,1.25)--(1.8,1.75)--(2.2,1.25)--(2.6,1.75);',
+        '\\draw (1,1.25)--(1.4,1.75)--(1.8,1.25)--(2.2,1.75)--(2.6,1.25);',
+        '\\draw (2.6,1.75)--(5.4,1.75);',
+        '\\draw (2.6,1.25)--(5.4,1.25);',
+        '\\node[fill=white] at (4,1.5) {\\scriptsize stable data};',
+        '\\draw (5.4,1.75)--(5.8,1.25)--(6.2,1.75)--(6.6,1.25)--(7,1.75);',
+        '\\draw (5.4,1.25)--(5.8,1.75)--(6.2,1.25)--(6.6,1.75)--(7,1.25);',
+        '\\draw[thick] (1,0)--(3,0)--(3,-0.8)--(5,-0.8)--(5,0)--(7,0);',
+        '\\draw[->] (0.8,-2.2)--(7.8,-2.2) node[right]{Time};',
+        '\\node[font=\\Large\\bfseries] at (4,4) {Write Cycle};'
+        ],[
+        '\\begin{tikzpicture}[font=\\sffamily]',
+        '\\node[anchor=east] at (0,3) {\\large Address};',
+        '\\node[anchor=east] at (0,1.5) {\\large Data Out};',
+        '\\node[anchor=east] at (0,0) {\\large $\\overline{\\mathrm{RE}}$};',
+        '\\draw (1,3.25)--(1.4,2.75)--(1.8,3.25)--(2.2,2.75);',
+        '\\draw (1,2.75)--(1.4,3.25)--(1.8,2.75)--(2.2,3.25);',
+        '\\draw (2.2,3.25)--(5.4,3.25);',
+        '\\draw (2.2,2.75)--(5.4,2.75);',
+        '\\node[fill=white] at (4,3) {\\scriptsize stable address};',
+        '\\draw (5.4,3.25)--(5.8,2.75)--(6.2,3.25)--(6.6,2.75)--(7,3.25);',
+        '\\draw (5.4,2.75)--(5.8,3.25)--(6.2,2.75)--(6.6,3.25)--(7,2.75);',
+        '\\draw[thick] (1,0)--(3,0)--(3,-0.8)--(5.0,-0.8)--(5.0,0)--(7,0);',
+        '\\draw (1,1.75)--(1.4,1.25)--(1.8,1.75)--(2.2,1.25)--(2.6,1.75)--(3.0,1.25)--(3.4,1.75)--(3.8,1.25);',
+        '\\draw (1,1.25)--(1.4,1.75)--(1.8,1.25)--(2.2,1.75)--(2.6,1.25)--(3.0,1.75)--(3.4,1.25)--(3.8,1.75);',
+        '\\draw (3.8,1.75)--(6.2,1.75);',
+        '\\draw (3.8,1.25)--(6.2,1.25);',
+        '\\node[fill=white] at (5,1.5) {\\scriptsize stable data};',
+        '\\draw (6.2,1.75)--(6.6,1.25)--(7,1.75);',
+        '\\draw (6.2,1.25)--(6.6,1.75)--(7,1.25);',
+        '\\draw[->] (0.8,-2.2)--(7.8,-2.2) node[right]{Time};',
+        '\\node[font=\\Large\\bfseries] at (4,4) {Read Cycle};'
+        ]];
+    const [tikz1, tikz2, tikz3] = diagrams.map(item => [
+        '\\usepackage{tikz}',
+        '\\usetikzlibrary{arrows.meta}',
+        '\\begin{document}',
+        ...item,
+        '\\end{tikzpicture}',
+        '\\end{document}'
+    ].join('\n'));
+    
+    // Inject TikZ first
+    const s1 = document.createElement('script');
+    s1.type = 'text/tikz';
+    s1.textContent = tikz1;
+    memory.appendChild(s1);
+    const s2 = document.createElement('script');
+    s2.type = 'text/tikz';
+    s2.textContent = tikz2;
+    write_cycle.appendChild(s2);
+    const s3 = document.createElement('script');
+    s3.type = 'text/tikz';
+    s3.textContent = tikz3;
+    read_cycle.appendChild(s3);
+
+    // Then load tikzjax.js (autostart). Use a cache-buster so it executes each time.
+    const t = document.createElement('script');
+    t.src = 'tikzjax.js?cb=' + Date.now();
+    document.head.appendChild(t);
+
+})();
+
+</script>
+</header>
+
+
+
+<footer class="academic-footer">
+    <p>Developed by Josh Moses with engineering assistance from Google Gemini (July 2026).</p>
+</footer>

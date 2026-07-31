@@ -5,29 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Noise Margins</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-    .tutorial-media {
-        max-width: 100%;       /* Ensures the GIF never overflows the card */
-        height: auto;          /* Maintains the original aspect ratio */
-        display: block;
-        margin: 0 auto;        /* Centers the image horizontally */
-        border-radius: 8px;    /* Matches your site's rounded card aesthetic */
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle elevation */
-    }
+    <link rel="stylesheet" href="fonts.css">
 
-    /* Optional Figure Caption Styling */
-    .media-container {
-        margin: 20px 0;
-        text-align: center;
-    }
-
-    figcaption {
-        font-size: 0.9em;
-        color: #7f8c8d;
-        margin-top: 8px;
-        font-style: italic;
-    }       
-    </style>
+    <!-- Tell TikZJax where your assets are -->
+    <script>
+        window.TikZJaxConfig = {
+        assets: { wasm: 'tex.wasm.gz', core: 'core.dump.gz' }
+        };
+    </script>
 </head>
 <body>
 
@@ -50,14 +35,106 @@
     <p>To allow for some <strong>noise margin</strong>, we must have V<sub>OH</sub> > V<sub>IH</sub> and V<sub>OL</sub> < V<sub>IL</sub>.  The <strong>noise margin</strong> is the <em>difference</em> between the input and output voltage thresholds, or Min((V<sub>OH</sub> - V<sub>IH</sub>), (V<sub>IL</sub> - V<sub>OL</sub>))</p>
 
     <figure class="media-container">
-        <img src="images/logic-levels.gif" alt="Noise margins" class="tutorial-media">
-        <figcaption>TTL Input & Output Voltage Levels
-            <span class="source-credit">
-            Source: <a href="https://www.electronics-tutorials.ws/logic/logic_1.html target="_blank" rel="noopener noreferrer">Electronics Tutorials</a>
+        <div id="noise_margins" class="tutorial-media" style="max-width: 600px;"></div>
+        <figcaption>Noise margins</a>
         </span>
         </figcaption>
     </figure>
 
+</header>
+<script>
+(async () => {
+    const tikz = [
+        '\\usepackage{tikz}',
+        '\\usetikzlibrary{arrows.meta}',
+        '\\begin{document}',
+        '\\begin{tikzpicture}[>=Stealth,font=\\sffamily]',
+        // '\\begin{tikzpicture}',
+        '\\def\\VCC{5.0}',
+        '\\def\\VOL{0.6}',
+        '\\def\\VIL{1.5}',
+        '\\def\\VIH{3.5}',
+        '\\def\\VOH{4.4}',
+        '\\def\\H{10}',
+        '\\pgfmathsetmacro{\\yVOL}{\\H*\\VOL/\\VCC}',
+        '\\pgfmathsetmacro{\\yVIL}{\\H*\\VIL/\\VCC}',
+        '\\pgfmathsetmacro{\\yVIH}{\\H*\\VIH/\\VCC}',
+        '\\pgfmathsetmacro{\\yVOH}{\\H*\\VOH/\\VCC}',
+        '\\pgfmathsetmacro{\\yForbiddenLeft}{0.5*(\\yVOL+\\yVOH)}',
+        '\\pgfmathsetmacro{\\yHighLeft}{0.5*(\\yVOH+\\H)}',
+        '\\pgfmathsetmacro{\\yForbiddenRight}{0.5*(\\yVIL+\\yVIH)}',
+        '\\pgfmathsetmacro{\\yHighRight}{0.5*(\\yVIH+\\H)}',
+        '\\pgfmathsetmacro{\\yNMH}{0.5*(\\yVIH+\\yVOH)}',
+        '\\pgfmathsetmacro{\\yNML}{0.5*(\\yVOL+\\yVIL)}',
+
+        '\\draw[thick] (-1,4) rectangle (1,6);',
+        '\\node at (0,5){Driver IC};',
+        '\\draw[thick] (11,4) rectangle (13,6);',
+        '\\node at (12,5){Receiver IC};',
+        '\\draw[thick] (1,5)--(11,5);',
+        '\\draw[thick] (3.7,8.8)..controls(4.0,9.5)and(4.3,7.9)..(4.6,8.8)..controls(4.9,9.4)and(5.2,7.9)..(5.5,8.8)..controls(5.8,9.4)and(6.1,7.9)..(6.4,8.8);',
+        '\\node at (4.5,9.3){Noise};',
+        '\\draw[thick] (3.7,1.2)..controls(4.0,2.0)and(4.3,0.4)..(4.6,1.3)..controls(4.9,1.9)and(5.2,0.4)..(5.5,1.3)..controls(5.8,1.9)and(6.1,0.4)..(6.4,1.3);',
+        '\\node at (4.5,0.7){Noise};',
+
+        '\\draw[thick] (2,0)--(2,\\H);',
+        '\\fill[green!20] (1.4,0) rectangle (3.6,\\yVOL);',
+        '\\fill[red!20] (1.4,\\yVOL) rectangle (3.6,\\yVOH);',
+        '\\fill[green!20] (1.4,\\yVOH) rectangle (3.6,\\H);',
+        '\\node[left] at (3.8,0){$0 V$};',
+        '\\node[left] at (4.3,\\H){$V_{CC} = 5 V$};',
+        '\\draw (1.8,\\yVOL)--(2.2,\\yVOL);',
+        '\\draw (1.8,\\yVOH)--(2.2,\\yVOH);',
+        '\\node[left] at (3.8,\\yVOL+0.2){$V_{OL}$};',
+        '\\node[left] at (3.8,\\yVOH+0.2){$V_{OH}$};',
+        '\\node[right] at (1.8,0.5*\\yVOL){LOW};',
+        '\\node[right] at (1.6,\\yForbiddenLeft+.5){Forbidden};',
+        '\\node[right] at (1.8,\\yHighLeft){HIGH};',
+
+        '\\draw[thick] (10,0)--(10,\\H);',
+        '\\fill[green!20] (8.4,0) rectangle (10.6,\\yVIL);',
+        '\\fill[red!20] (8.4,\\yVIL) rectangle (10.6,\\yVIH);',
+        '\\fill[green!20] (8.4,\\yVIH) rectangle (10.6,\\H);',
+        '\\node[right] at (7.7,0){$0 V$};',
+        '\\node[right] at (7.2,\\H){$V_{CC} = 5 V$};',
+        '\\draw (9.8,\\yVIL)--(10.2,\\yVIL);',
+        '\\draw (9.8,\\yVIH)--(10.2,\\yVIH);',
+        '\\node[right] at (7.7,\\yVIL+.2){$V_{IL}$};',
+        '\\node[right] at (7.7,\\yVIH+.2){$V_{IH}$};',
+        '\\node[left] at (9.8,0.5*\\yVIL){LOW};',
+        '\\node[left] at (10.3,\\yForbiddenRight+.5){Uncertain};',
+        '\\node[left] at (9.8,\\yHighRight){HIGH};',
+        '\\draw[thick] (1,5)--(11,5);',
+
+        '\\draw[dashed] (2.2,\\yVOH)--(7.5,\\yVOH);',
+        '\\draw[dashed] (5.5,\\yVIH)--(9.8,\\yVIH);',
+        '\\draw[dashed] (2.2,\\yVOL)--(7.5,\\yVOL);',
+        '\\draw[dashed] (5.5,\\yVIL)--(9.8,\\yVIL);',
+
+        '\\draw[->,blue,line width=1.5pt] (6.5,\\yNMH+0.25) -- (6.5,\\yVOH);',
+        '\\draw[<-,blue,line width=1.5pt] (6.5,\\yVIH) -- (6.5,\\yNMH-0.25);',
+        '\\node[ draw=blue, thin, fill=white, text=blue, inner sep=3pt ] at (6.0,\\yNMH) {$NM_H=V_{OH}-V_{IH}>0$};',
+        '\\draw[->,blue,line width=1.5pt] (6.5,\\yNML-0.25) -- (6.5,\\yVOL);',
+        '\\draw[<-,blue,line width=1.5pt] (6.5,\\yVIL) -- (6.5,\\yNML+0.25);',
+        '\\node[ draw=blue, thin, fill=white, text=blue, inner sep=3pt ] at (6.0,\\yNML) {$NM_L=V_{IL}-V_{OL}>0$};',
+        '\\end{tikzpicture}',
+        '\\end{document}'
+    ].join('\n');
+    
+    // Inject TikZ first
+    const s = document.createElement('script');
+    s.type = 'text/tikz';
+    s.textContent = tikz;
+    noise_margins.appendChild(s);
+
+    // Then load tikzjax.js (autostart). Use a cache-buster so it executes each time.
+    const t = document.createElement('script');
+    t.src = 'tikzjax.js?cb=' + Date.now();
+    document.head.appendChild(t);
+
+})();
+
+</script>
 </header>
 
 <footer class="academic-footer">

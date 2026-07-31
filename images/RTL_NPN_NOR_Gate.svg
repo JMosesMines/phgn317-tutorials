@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  style="viewBox:0 0 280 280; stroke:black; stroke-width:2; fill:none; font-size:18px;
+  font-style:italic" width="280" height="280">
+  <style type="text/css"> text { stroke:none; fill:black } tspan { font-size:14px }
+  </style>
+  <defs>
+    <g id="npn">
+      <circle cx="50" cy="50" r="25" fill="#d0f0f0"/>
+      <line x1="35" y1="40" x2="65" y2="40" stroke-width="4"/>
+      <path d="M55,40 l6,8 l-3,2 l9,6 l-3,-10 l-3,2 l9,12" />
+      <line x1="45" y1="40" x2="30" y2="60"/>
+      <line x1="50" y1="40" x2="50" y2="00"/>
+      <line x1="70" y1="60" x2="100" y2="60"/>
+      <line x1="30" y1="60" x2="0" y2="60"/>
+    </g>
+    <g id="resistor">
+      <line x1="0" y1="20" x2="12" y2="20"/>
+      <path d="M12,20 l3,-6 l6,12 l6,-12 l6,12 l6,-12 l6,12 l3,-6" stroke-width="3"/>
+      <line x1="48" y1="20" x2="60" y2="20"/>
+    </g>
+    <g id="port">
+      <line x1="7" y1="5" x2="15" y2="5"/>
+      <circle cx="4" cy="5" r="3"/>
+    </g>
+    <g id="ground">
+      <line x1="5" y1="10" x2="25" y2="10" stroke-width="3"/>
+      <line x1="9" y1="15" x2="21" y2="15" stroke-width="3"/>
+      <line x1="13" y1="20" x2="17" y2="20" stroke-width="3"/>
+      <line x1="15" y1="10" x2="15" y2="0"/>
+    </g>
+    <g id="tcross">
+      <line x1="0" y1="5" x2="10" y2="5"/>
+      <line x1="5" y1="5" x2="5" y2="10"/>
+      <circle cx="5" cy="5" r="2"/>
+    </g>
+    <g id="power">
+      <line x1="5" y1="15" x2="25" y2="15" stroke-width="3"/>
+      <line x1="15" y1="15" x2="15" y2="0"/>
+    </g>
+  </defs>
+
+  <text x="15" y="135">A</text>
+  <use xlink:href="#port"     transform="translate(30,125)"/>
+  <text x="15" y="175">B</text>
+  <use xlink:href="#port"     transform="translate(30,165)"/>
+  <text x="65" y="110">R<tspan dy="5">3</tspan></text>
+  <use xlink:href="#resistor" transform="translate(45,110)"/>
+  <use xlink:href="#resistor" transform="translate(45,150)"/>
+  <text x="65" y="200">R<tspan dy="5">4</tspan></text>
+
+  <path d="M105,130 l5,0 l0,40 l35,0"/>
+  <use xlink:href="#tcross"   transform="translate(105,165) rotate(180,5,5)"/>
+  <use xlink:href="#tcross"   transform="translate(120,165)"/>
+
+  <use xlink:href="#resistor" transform="translate(95,185) rotate(90,30,20)"/>
+  <text x="95" y="215">R<tspan dy="5">1</tspan></text>
+  <use xlink:href="#power"    transform="translate(110,235)"/>
+  <text x="115" y="270">V-</text>
+
+  <text x="195" y="25">V+</text>
+  <use xlink:href="#power"    transform="translate(190,20) rotate(180,15,15)"/>
+  <use xlink:href="#resistor" transform="translate(175,60) rotate(90,30,20)"/>
+  <text x="220" y="85">R<tspan dy="5">2</tspan></text>
+  <use xlink:href="#tcross"   transform="translate(200,110) rotate(270,5,5)"/>
+  <line x1="210" y1="115" x2="235" y2="115"/>
+  <use xlink:href="#port"     transform="translate(235,110) rotate(180,7.5,5)"/>
+  <text x="255" y="120">Q</text>
+  <use xlink:href="#npn"      transform="translate(145,220) scale(1,-1) rotate(270,50,50)"/>
+  <text x="225" y="180">Q<tspan dy="5">1</tspan></text>
+  <use xlink:href="#ground"   transform="translate(190,220)"/>
+</svg>
+
