@@ -41,6 +41,30 @@
         </span>
         </figcaption>
     </figure>
+    <h3>Bidirectional Bus</h3>
+    <p>To save space, we can reduce the number of wires going to the memory IC by making the Data Bus <strong>Bidirectional</strong>.  We accomplish this by using <strong>Three-state logic</strong>.  A three-state, or tri-state buffer can pass a high or low signal through, like a closed switch, or, third, it can leave its output node <em>floating</em>, not driving it at all, like an open switch.  This lets the memory circuit receive data from the data bus, when Write Enable is active, or drive data to the data bus, when Read Enable is active.</p>
+   <figure class="media-container">
+        <div id="bidirectional" class="tutorial-media" style="max-width: 600px;"></div>
+        <figcaption>Bidirectional Data Bus</a>
+        </span>
+        </figcaption>
+    </figure>
+    <h3>Three-State Buffer</h3>
+    <p>The bi-directional bus is enabled by the <strong>Tri-State Buffer</strong>.  To understand how it works at a transistor level, first make sure you understand how a basic CMOS inverter is made from MOSFETs.  In this circuit, M2 and M3 function just like a standard CMOS inverter.  Exactly one of the two transistors is always ON, or conducting, and the other is always OFF, depending on the value of the Input signal.  The Tri-State Buffer circuit adds two more transistors, controlled by a second input, the <strong>Enable</strong>.  When Enable is High, both M1 and M4 are ON, so that the Output can source or sink current to drive its node to High or Low, according to the value of the Input (A) signal.  When Enable is low, both M1 and M4 are off.  Their channels are in series with the channels of M2 and M3, so this prevents the circuit from sourcing or sinking any current at all, leaving the output <em>floating</em>. </p>
+   <figure class="media-container">
+        <div id="tri_state" class="tutorial-media" style="max-width: 600px;"></div>
+        <figcaption>Tri-State Buffer</a>
+        </span>
+        </figcaption>
+    </figure>
+    <h3>Memory-mapped peripherals</h3>
+    <p>Once we have an efficient bus structure though with to bidirectionally transmit digital data to or from a specific address, we can use this same bus structure to interface with peripheral devices such as digital sensors and actuators, by assigning a memory address to those peripherals.  An <em>address decoder</em> enables the peripheral device when its address matches the address on the Address Bus.  This is called <strong>Memory-mapped I/O.</strong></p>
+   <figure class="media-container">
+        <div id="bus_structure" class="tutorial-media" style="max-width: 600px;"></div>
+        <figcaption>Memory-mapped I/O</a>
+        </span>
+        </figcaption>
+    </figure>
 <script>
 (async () => {
     const diagrams =[[
@@ -51,7 +75,8 @@
         '\\draw[->,thick] (-5, 0.5) -- (-1.5, 0.5) node[midway,above=-2pt,xshift=-10pt]{\\normalsize Read Enable};',
         '\\draw[->,thick] (-5,-0.5) -- (-1.5,-0.5) node[midway,above=-2pt,xshift=-10pt]{\\normalsize Write Enable};',
         '\\draw[bus,->] (-5.5, -1.5) -- node[above=-9pt,xshift=-10pt]{\\normalsize \\emph{n} data input lines} (-1.5, -1.5);',
-        '\\draw[bus,->] (1.5,-1.5) -- (5.5,-1.5) node[midway,above=-9pt,xshift=-10pt]{\\normalsize \\emph{n} data output lines};'
+        '\\draw[bus,->] (1.5,-1.5) -- (5.5,-1.5) node[midway,above=-9pt,xshift=-10pt]{\\normalsize \\emph{n} data output lines};',
+        '\\end{tikzpicture}'
         ],[
         '\\begin{tikzpicture}[font=\\sffamily]',
         '\\node[anchor=east] at (0,3) {\\large Address};',
@@ -73,7 +98,8 @@
         '\\draw (5.4,1.25)--(5.8,1.75)--(6.2,1.25)--(6.6,1.75)--(7,1.25);',
         '\\draw[thick] (1,0)--(3,0)--(3,-0.8)--(5,-0.8)--(5,0)--(7,0);',
         '\\draw[->] (0.8,-2.2)--(7.8,-2.2) node[right]{Time};',
-        '\\node[font=\\Large\\bfseries] at (4,4) {Write Cycle};'
+        '\\node[font=\\Large\\bfseries] at (4,4) {Write Cycle};',
+        '\\end{tikzpicture}'
         ],[
         '\\begin{tikzpicture}[font=\\sffamily]',
         '\\node[anchor=east] at (0,3) {\\large Address};',
@@ -95,14 +121,129 @@
         '\\draw (6.2,1.75)--(6.6,1.25)--(7,1.75);',
         '\\draw (6.2,1.25)--(6.6,1.75)--(7,1.25);',
         '\\draw[->] (0.8,-2.2)--(7.8,-2.2) node[right]{Time};',
-        '\\node[font=\\Large\\bfseries] at (4,4) {Read Cycle};'
+        '\\node[font=\\Large\\bfseries] at (4,4) {Read Cycle};',
+        '\\end{tikzpicture}'
+        ],[
+        '\\begin{tikzpicture}[scale=1.1]',
+        '\\node[font=\\Large\\bfseries] at (-0.8, 3.2) {Bidirectional Memory I/O Circuit};',
+        '\\draw[thick, fill=gray!10] (0, -1.0) rectangle (2.2, 1.0);',
+        '\\node[font=\\bfseries\\small] at (1.1, 0.3) {Memory Cell};',
+        '\\node[font=\\scriptsize, text=gray!80!black] at (1.1, -0.1) {D Flip-Flop};',
+        '\\draw[thick] (0, -0.45) -- (0.15, -0.6) -- (0, -0.75);',
+        '\\node[anchor=west, font=\\scriptsize\\bfseries] at (0, 0.6) {D};',
+        '\\node[anchor=east, font=\\scriptsize\\bfseries] at (2.2, 0) {Q};',
+        '\\node[anchor=west, font=\\scriptsize\\bfseries] at (0.2, -0.6) {CLK};',
+        '\\draw[green!50!black, ultra thick] (-4.8, 2.5) -- (-4.8, -2.8) node[below, font=\\small\\bfseries] {Shared Data Bus};',
+        '\\draw[thick, fill=red!10, draw=red!70!black] (-3.3, 0.85) -- (-3.3, 1.55) -- (-2.5, 1.2) -- cycle;',
+        '\\node[font=\\scriptsize\\bfseries, color=red!70!black] at (-2.9, 0.5) {Input Buffer};',
+        '\\draw[red!70!black, thick, ->] (-4.8, 1.2) -- (-3.3, 1.2);',
+        '\\draw[red!70!black, thick, ->] (-2.5, 1.2) -- (-1.0, 1.2) -- (-1.0, 0.6) -- (0, 0.6);',
+        '\\draw[blue!70!black, thick, <-] (-2.9, 1.375) -- (-2.9, 2.2) node[above, font=\\scriptsize\\bfseries] {WE (Write Enable)};',
+        '\\draw[thick, fill=red!10, draw=red!70!black] (-2.5, -1.85) -- (-2.5, -1.15) -- (-3.3, -1.5) -- cycle;',
+        '\\node[font=\\scriptsize\\bfseries, color=red!70!black] at (-2.9, -0.8) {Output Buffer};',
+        '\\draw[red!70!black, thick] (2.2, 0) -- (2.8, 0) -- (2.8, -1.5) -- (-2.5, -1.5);',
+        '\\draw[red!70!black, thick, ->] (-3.3, -1.5) -- (-4.8, -1.5);',
+        '\\draw[blue!70!black, thick, <-] (-2.9, -1.625) -- (-2.9, -2.4) node[below, font=\\scriptsize\\bfseries] {RE (Read Enable)};',
+        '\\draw[blue!70!black, thick, <-] (0, -0.6) -- (-0.8, -0.6) node[left, font=\\scriptsize\\bfseries] {CLK};',
+        '\\end{tikzpicture}'
+        ],[
+        '\\begin{circuitikz}[scale=1.1, every node/.style={font=\\small}]',
+        '\\node[font=\\large\\bfseries] at (0, 6.2) {CMOS Non-Inverting Tri-State Buffer};',
+        '\\node[vcc] (VDD) at (0, 5) {\\,$V_{DD}$\\,};',
+        '\\node[tground] (GND) at (0, -2.5) {\\,$GND$\\,};',
+        '\\node [pmos, label={right:M1 (p-type)}] (M1) at (0, 4) {};',
+        '\\node [pmos, label={right:M2 (p-type)}] (M2) at (0, 2.5) {};',
+        '\\node [nmos, label={right:M3 (n-type)}] (M3) at (0, 0.5) {};',
+        '\\node [nmos, label={right:M4 (n-type)}] (M4) at (0, -1) {};',
+
+        '\\draw (VDD) -- (M1.source);',
+        '\\draw (M1.drain) -- (M2.source);',
+        '\\draw (M2.drain) -- (M3.drain);',
+        '\\draw (M3.source) -- (M4.drain);',
+        '\\draw (M4.source) -- (GND);',
+        '\\draw (M3.drain) node[circle,fill,inner sep=1.5pt]{} -- ++(2.5, 0) node[right, font=\\bfseries\\large] {Output (Y)};',
+        '\\coordinate (A_start) at (-4.5, 1.5);',
+        '\\draw (A_start) node[left, font=\\bfseries\\large] {Input (A)} -- (-3.5, 1.5);',
+        '\\draw[thick, fill=white] (-4.0, 1.25) -- (-4.0, 1.75) -- (-3.5, 1.5) -- cycle;' ,
+        '\\draw[thick, fill=white] (-3.43, 1.5) circle (2pt);',
+        '\\draw (-3.36, 1.5) -- (-1.8, 1.5) coordinate (A_split);',
+        '\\node[above=1pt, font=\\scriptsize, color=red!70!black] at (-2.3, 1.5) {$\\overline{\\text{A}}$};',  
+        '\\draw (A_split) |- (M2.gate);',
+        '\\draw (A_split) |- (M3.gate);',
+        '\\coordinate (EN_start) at (-4.0, -1);',
+        '\\draw (EN_start) node[left, font=\\bfseries\\large] {Enable (EN)} -- (M4.gate);',
+        '\\draw ($(EN_start)!0.38!(M4.gate)$) node[circle,fill,inner sep=1.5pt]{} -- (-2.8, -1) -- (-2.8, 3.8);',
+        '\\draw[thick, fill=white] (-3.05, 3.0) -- (-2.55, 3.0) -- (-2.8, 3.5) -- cycle;',
+        '\\draw[thick, fill=white] (-2.8, 3.5) circle (2pt);',
+        '\\draw (-2.8, 3.54) -- (-2.8, 4.0) -- (M1.gate);',
+        '\\node[above=2pt, font=\\scriptsize, color=blue!70!black] at (M4.gate) {EN};',
+        '\\node[above=2pt, font=\\scriptsize, color=blue!70!black] at (M1.gate) {$\\overline{\\text{EN}}$};',
+        '\\node[draw, thick, fill=white, inner sep=5pt, rounded corners] (table) at (4.8, 4.0) {',
+            '\\parbox{5.5cm}{',
+            '\\centering',
+            '\\bfseries Truth Table \\\\',
+            '(Non-Inverting Buffer) \\\\[4pt]',
+            '\\small',
+            '\\begin{tabular}{|c|c||c|}',
+            '\\hline',
+            '\\textbf{EN} & \\textbf{Input (A)} & \\textbf{Output (Y)} \\\\ \\hline',
+                '0           & X                  & \\textbf{Hi-Z} \\\\ \\hline',
+                '1           & 0                  & \\textbf{0}    \\\\ \\hline',
+                '1           & 1                  & \\textbf{1}    \\\\ \\hline',
+            '\\end{tabular}',
+            '}',
+        '};',
+        '\\end{circuitikz}'
+        ],[
+        '\\begin{tikzpicture}[>=Latex, font=\\sffamily, block/.style={draw=black, line width=2pt,',
+        'fill=MinesDarkBlue, text=white, minimum width=3.5cm, minimum height=2cm, align=center},',
+        'busbox/.style={draw=none, line width=2pt, fill=MinesDarkBlue, fill opacity=0.65, minimum width=13cm, minimum height=0.8cm},',
+        'conn/.style={draw=black,line width=2.8pt}]',
+        '\\node[block] at (-5,3) {\\Large\\bfseries CPU};',
+        '\\node[block] at (0,3) {\\Large\\bfseries Memory};',
+        '\\node[block] at (5,3) {\\Large\\bfseries Peripheral \\\\ \\Large\\bfseries Devices};',
+        
+        '\\begin{pgfonlayer}{background}',
+        '\\draw[conn,<->] (-5.8,2) -- (-5.8,0.4);',
+        '\\draw[conn,->]  (-5.0,2) -- (-5.0,-1.2);',
+        '\\draw[conn,->] (-4.2,2) -- (-4.2,-2.8);',
+        '\\draw[conn,<->] (-1.0,2) -- (-1.0,0.4);',
+        '\\draw[conn,<-]  (0.0,2) -- (0.0,-1.2);',
+        '\\draw[conn,<-] (1.0,2) -- (1.0,-2.8);',
+        '\\draw[conn,<->] (4.0,2) -- (4.0,0.4);',
+        '\\draw[conn,<-]  (5.0,2) -- (5.0,-1.2);',
+        '\\draw[conn,<-] (6.0,2) -- (6.0,-2.8);',
+        '\\end{pgfonlayer}',
+
+        '\\node[busbox] (ctrl) at (0,-0.0) {};',
+        '\\node[busbox] (addr) at (0,-1.6) {};',
+        '\\node[busbox] (data) at (0,-3.2) {};',
+
+        '\\foreach \\b in {ctrl,addr,data} { \\draw[line width=2pt] (\\b.north west) -- (\\b.north east);',
+        '\\draw[line width=2pt] (\\b.south west) -- (\\b.south east); }',
+
+        '\\begin{pgfonlayer}{foreground}',
+        '\\node[text=white,font=\\LARGE\\bfseries\\sffamily] at (0,-0.0) {Data bus};',
+        '\\node[text=white,font=\\LARGE\\bfseries\\sffamily] at (0,-1.6) {Address bus};',
+        '\\node[text=white,font=\\LARGE\\bfseries\\sffamily] at (0,-3.2) {Control bus};',
+        '\\end{pgfonlayer}',
+
+        '\\end{tikzpicture}'
+
         ]];
-    const [tikz1, tikz2, tikz3] = diagrams.map(item => [
+    const [tikz1, tikz2, tikz3, tikz4, tikz5, tikz6] = diagrams.map(item => [
         '\\usepackage{tikz}',
         '\\usetikzlibrary{arrows.meta}',
+        '\\usepackage{amsmath}',
+        '\\usepackage[american]{circuitikz}',
+        '\\usetikzlibrary{calc}',
+        '\\definecolor{MinesDarkBlue}{HTML}{21314D}',
+        '\\definecolor{MinesLightBlue}{HTML}{92A2BD}',
+        '\\pgfdeclarelayer{background}',
+        '\\pgfdeclarelayer{foreground}',
+        '\\pgfsetlayers{background,main,foreground}',
         '\\begin{document}',
         ...item,
-        '\\end{tikzpicture}',
         '\\end{document}'
     ].join('\n'));
     
@@ -119,6 +260,18 @@
     s3.type = 'text/tikz';
     s3.textContent = tikz3;
     read_cycle.appendChild(s3);
+    const s4 = document.createElement('script');
+    s4.type = 'text/tikz';
+    s4.textContent = tikz4;
+    bidirectional.appendChild(s4);
+    const s5 = document.createElement('script');
+    s5.type = 'text/tikz';
+    s5.textContent = tikz5;
+    tri_state.appendChild(s5);
+    const s6 = document.createElement('script');
+    s6.type = 'text/tikz';
+    s6.textContent = tikz6;
+    bus_structure.appendChild(s6);
 
     // Then load tikzjax.js (autostart). Use a cache-buster so it executes each time.
     const t = document.createElement('script');
