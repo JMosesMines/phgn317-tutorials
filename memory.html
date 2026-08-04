@@ -22,7 +22,7 @@
     <h3>Signal I/O</h3>
     <figure class="media-container">
         <div id="memory" class="tutorial-media" style="max-width: 600px;"></div>
-        <figcaption>Memory</a>
+        <figcaption>Memory signals</a>
         </span>
         </figcaption>
     </figure>
@@ -30,14 +30,14 @@
     <p>Memory operations must proceed in a certain sequence.  For a Write operation, the CPU sets the value of the Address and Data Input busses, and then activates and deactivates the Write Enable Signal, to latch the data into memory.  Then the busses are ready for the next operation.</p>
     <figure class="media-container">
         <div id="write_cycle" class="tutorial-media" style="max-width: 600px;"></div>
-        <figcaption>Write Cycle</a>
+        <figcaption>Write Cycle Timing</a>
         </span>
         </figcaption>
     </figure>
     <p>For a Read operation, the CPU sets a value on the Address bus, and then activates the Read Enable signal.  The memory device then sets the value of the Data Output bus.  After reading the data, the controller then deactivates the Read Enable signal.  Then the busses are ready for the next operation</p>
     <figure class="media-container">
         <div id="read_cycle" class="tutorial-media" style="max-width: 600px;"></div>
-        <figcaption>Read Cycle</a>
+        <figcaption>Read Cycle Timing</a>
         </span>
         </figcaption>
     </figure>
@@ -58,7 +58,7 @@
         </figcaption>
     </figure>
     <h3>Memory-mapped peripherals</h3>
-    <p>Once we have an efficient bus structure though with to bidirectionally transmit digital data to or from a specific address, we can use this same bus structure to interface with peripheral devices such as digital sensors and actuators, by assigning a memory address to those peripherals.  An <em>address decoder</em> enables the peripheral device when its address matches the address on the Address Bus.  This is called <strong>Memory-mapped I/O.</strong></p>
+    <p>Once we have an efficient bus structure though which to bidirectionally transmit digital data to or from certain memory addresses, we can also use this same bus structure to interface with peripheral devices such as digital sensors and actuators, by assigning a specific address range to those peripherals.  In this way, the CPU can send and receive data to and from peripheral devices in the same way that it sends and receives data to and from memory, simply by addressing the device.  An <em>address decoder</em> enables the peripheral device when its address matches the address on the Address Bus.  This is called <strong>Memory-mapped I/O.</strong></p>
    <figure class="media-container">
         <div id="bus_structure" class="tutorial-media" style="max-width: 600px;"></div>
         <figcaption>Memory-mapped I/O</a>

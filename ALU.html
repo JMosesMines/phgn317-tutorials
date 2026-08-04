@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arithmetic Logic Unit</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="fonts.css">
+    <style>
+        .alu-table {
+        border-collapse: collapse;
+        text-align: center;
+        font-family: monospace;
+        }
+
+        .alu-table th, 
+        .alu-table td {
+        border: 1px solid #ccc;
+        padding: 4px 8px;
+        }
+    </style>
+    <!-- Tell TikZJax where your assets are -->
+    <script>
+        window.TikZJaxConfig = {
+        assets: { wasm: 'tex.wasm.gz', core: 'core.dump.gz' }
+        };
+    </script>
+</head>
+<body>
+
+<header class="card">
+    <h1>Arithmetic Logic Unit</h1>
+    <p>An <strong>arithmetic logic unit (ALU)</strong> uses a combination of logic gates to perform any of several available digital operations.  The inputs are the <strong>operands</strong>, and an <strong>opcode</strong>.  The opcode selects what operation should be performed on the operands.</p>
+    <figure class="media-container">
+        <div id="ALU" class="tutorial-media" style="max-width: 600px;"></div>
+        <figcaption>ALU symbol</a>
+        </span>
+        </figcaption>
+    </figure>
+    <p>The 74181 is a relatively simple classic example of a standalone ALU IC.  Look over its data sheet, <a href="https://www.ti.com/lit/ds/symlink/sn54ls181.pdf">here</a>.</p>
+<script>
+(async () => {
+    const diagrams =[[
+    "\\begin{tikzpicture}[",
+    ">=Stealth,",
+    "font=\\sffamily,",
+    "line width=0.8pt",
+    "]",
+    "\\draw[line width=1.2pt]",
+    "(0, 2.8) -- (1.5, 1.7) -- (1.5, -1.7) -- (0, -2.8)",
+    "-- (0, -0.6) -- (0.4, 0) -- (0, 0.6) -- cycle;",
+    "\\node at (0.85, 1) {\\Large ALU};",
+    "\\draw[->] (-0.5, 1.8) node[left] {operand A} -- (0, 1.8);",
+    "\\draw[->] (-0.5, -1.3) node[left] {operand B} -- (0, -1.3);",
+    "\\draw[<-,  thick] (0.75, 2.25) -- (0.75, 3.1)",
+    "node[above,  font=\\sffamily\\bfseries] {opcode};",
+    "\\draw[->] (1.5, 0.8) -- (2.0, 0.8) node[right] {Y result};",
+    "\\draw[->] (1.5, -0.8) -- (2.0, -0.8) node[right] {Status};",
+    "\\end{tikzpicture}"
+    ]];
+const [tikz1] = diagrams.map(item => [
+    '\\usepackage{tikz}',
+    "\\usetikzlibrary{arrows.meta}",
+    "\\begin{document}",
+    ...item,
+    '\\end{document}'
+].join('\n'));
+
+    // Inject TikZ first
+    const s1 = document.createElement('script');
+    s1.type = 'text/tikz';
+    s1.textContent = tikz1;
+    ALU.appendChild(s1);
+    // Then load tikzjax.js (autostart). Use a cache-buster so it executes each time.
+    const t = document.createElement('script');
+    t.src = 'tikzjax.js?cb=' + Date.now();
+    document.head.appendChild(t);
+
+})();
+
+</script>
+</header>
+
+<main class="card">
+    <h2>Practice Area</h2>
+    <div class="controls">
+    <button onclick="generateProblem()">Generate Problem</button>
+    <button id="btn-solution" onclick="showSolution()" disabled>Reveal Solution</button>
+
+    <div id="problem-area" class="hidden">
+        <div id="problem-statement"></div>
+        <div id="solution-area" class="hidden"></div>
+    </div>
+</main>
+
+<footer class="academic-footer">
+    <p>Developed by Josh Moses with engineering assistance from Google Gemini (July 2026).</p>
+</footer>
+
+<script>
+    let currentProblem = null;
+
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function generateProblem() {
+        // const type = document.getElementById('conversion-type').value;
+        const problemArea = document.getElementById('problem-area');
+        const statement = document.getElementById('problem-statement');
+        const solutionArea = document.getElementById('solution-area');
+        const btnSolution = document.getElementById('btn-solution');
+
+        solutionArea.innerHTML = '';
+        solutionArea.classList.add('hidden');
+        problemArea.classList.remove('hidden');
+        btnSolution.disabled = false;
+
+        const MODE_NAMES = ['L (Arithmetic Operations)', 'H (Logic Functions)'];
+        let mode = getRandomInt(0, 1);
+        let selection = getRandomInt(0,15);
+        let A = getRandomInt(0,15);
+        let B = getRandomInt(0,15);
+        
+        currentProblem = { mode, selection, A, B };
+        let questionText = `Given M = ${MODE_NAMES[mode]}, and Selection inputs S = ${selection.toString(2).padStart(4, '0')}<sub>2</sub>, determine the output F<sub>3</sub>F<sub>2</sub>F<sub>1</sub>F<sub>0</sub> for inputs A = ${A.toString(2).padStart(4, '0')}<sub>2</sub> and B = ${B.toString(2).padStart(4, '0')}<sub>2</sub>`;
+        
+        statement.innerHTML = questionText;
+    }
+
+    function showSolution() {
+        const solutionArea = document.getElementById('solution-area');
+        solutionArea.innerHTML = '';
+        solutionArea.classList.remove('hidden');
+        document.getElementById('btn-solution').disabled = true;
+        renderSolution(solutionArea);        
+    }
+
+    function renderSolution(container){
+        const MODE_NAMES = ['Arithmetic Operation', 'Logic Function'];
+        let solution = evaluate();
+        let html = `<p>Let's start by assuming an Active-High interpretation.  In the 74LS181 data sheet, find the table for "Active-High Data".  Then find the row corresponding to the given Selection code.  Look for this row:</p>`;
+        html += generateSelectTable(currentProblem.selection);
+        html += `<p>That row shows that the ${MODE_NAMES[currentProblem.mode]} for this Selection code is ${solution.operationName}, with the result ${solution.binaryF}<sub>2</sub>`;
+
+        container.innerHTML = html;
+    }
+
+    function generateSelectTable(sValue = null) {
+        const valuesToRender = (sValue !== null) 
+            ? [sValue & 0xF] 
+            : Array.from({ length: 16 }, (_, i) => i);
+
+        let html = `
+        <table class="alu-table">
+        <thead>
+            <tr>
+            <th>S3</th>
+            <th>S2</th>
+            <th>S1</th>
+            <th>S0</th>
+            </tr>
+        </thead>
+        <tbody>`;
+
+        valuesToRender.forEach(s => {
+            const s3 = (s & 0b1000) ? 'H' : 'L';
+            const s2 = (s & 0b0100) ? 'H' : 'L';
+            const s1 = (s & 0b0010) ? 'H' : 'L';
+            const s0 = (s & 0b0001) ? 'H' : 'L';
+
+            html += `
+            <tr>
+            <td>${s3}</td>
+            <td>${s2}</td>
+            <td>${s1}</td>
+            <td>${s0}</td>
+            </tr>`;
+        });
+
+        html += `
+        </tbody>
+        </table>`;
+
+        return html;
+    }
+
+    function evaluate(){
+        currentProblem.mode &= 0x1;
+        currentProblem.selection &= 0xF;
+        currentProblem.A &= 0xF;
+        currentProblem.B &= 0xF;
+
+        let Cn_bar = 1;
+
+        let F = 0;
+        let operationName = '';
+
+        if (currentProblem.mode == 1) {
+        // --- LOGIC MODE (M = 1) ---
+        const logicTable = [
+        { name: 'NOT A',           calc: (a, b) => ~a },
+        { name: 'NOT (A OR B)',    calc: (a, b) => ~(a | b) },
+        { name: '(NOT A) AND B',   calc: (a, b) => (~a) & b },
+        { name: 'LOGICAL 0',       calc: (a, b) => 0 },
+        { name: 'NOT (A AND B)',   calc: (a, b) => ~(a & b) },
+        { name: 'NOT B',           calc: (a, b) => ~b },
+        { name: 'A XOR B',         calc: (a, b) => a ^ b },
+        { name: 'A AND (NOT B)',   calc: (a, b) => a & (~b) },
+        { name: '(NOT A) OR B',    calc: (a, b) => (~a) | b },
+        { name: 'A XNOR B',        calc: (a, b) => ~(a ^ b) },
+        { name: 'B',               calc: (a, b) => b },
+        { name: 'A AND B',         calc: (a, b) => a & b },
+        { name: 'LOGICAL 1 (0xF)', calc: (a, b) => 0xF },
+        { name: 'A OR (NOT B)',    calc: (a, b) => a | (~b) },
+        { name: 'A OR B',          calc: (a, b) => a | b },
+        { name: 'A',               calc: (a, b) => a }            
+        ];
+
+        operationName = logicTable[currentProblem.selection].name;
+        F = logicTable[currentProblem.selection].calc(currentProblem.A, currentProblem.B) & 0xF;
+        } else { 
+        // --- ARITHMETIC MODE (M = 0) ---
+        // Cn_bar is active low: 0 means carry-in (+1), 1 means no carry-in (+0)
+        const carryIn = Cn_bar === 0 ? 1 : 0;
+        const notB = (~currentProblem.B) & 0xF;
+
+        const arithTable = [
+        { name: 'A',                             calc: (a, b) => a },
+        { name: 'A OR B',                        calc: (a, b) => a | b },
+        { name: 'A OR (NOT B)',                  calc: (a, b) => a | notB },
+        { name: 'MINUS 1 (-1)',                  calc: (a, b) => 15 }, // 15 = -1 in 4-bit 2's complement
+        { name: 'A PLUS (A AND (NOT B))',        calc: (a, b) => a + (a & notB) },
+        { name: '(A OR B) PLUS (A AND (NOT B))', calc: (a, b) => (a | b) + (a & notB) },
+        { name: 'A MINUS B MINUS 1',             calc: (a, b) => a + notB }, // A + ~B = A - B - 1
+        { name: 'A AND (NOT B) MINUS 1',         calc: (a, b) => (a & notB) + 15 },
+        { name: 'A PLUS (A AND B)',              calc: (a, b) => a + (a & b) },
+        { name: 'A PLUS B',                      calc: (a, b) => a + b },
+        { name: '(A OR (NOT B)) PLUS (A AND B)', calc: (a, b) => (a | notB) + (a & b) },
+        { name: '(A AND B) MINUS 1',             calc: (a, b) => (a & b) + 15 },
+        { name: 'A PLUS A',                      calc: (a, b) => a + a },
+        { name: '(A OR B) PLUS A',               calc: (a, b) => (a | b) + a },
+        { name: '(A OR (NOT B)) PLUS A',         calc: (a, b) => (a | notB) + a },
+        { name: 'A MINUS 1',                     calc: (a, b) => a + 15 }
+        ];
+
+        const baseOp = arithTable[currentProblem.selection];
+        operationName = carryIn ? `${baseOp.name} PLUS 1` : baseOp.name;
+        
+        const rawResult = baseOp.calc(currentProblem.A, currentProblem.B) + carryIn;
+        F = rawResult & 0xF;        
+
+    }
+
+    return {
+        operationName,
+        F,
+        binaryF: F.toString(2).padStart(4, '0')
+    };
+    }
+    </script>
+</body>
+</html>
