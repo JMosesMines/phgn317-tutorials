@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proof: Additive Inverse of a Binary Number</title>
+    <!-- KaTeX CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <!-- KaTeX JS -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+            onload="renderMathInElement(document.body);"></script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 750px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            line-height: 1.6;
+            color: #222;
+        }
+        h1 { font-size: 1.5rem; color: #111; }
+        h2 { font-size: 1.15rem; color: #333; margin-top: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 0.3rem; }
+        p { margin: 0.8rem 0; }
+    </style>
+</head>
+<body>
+
+    <h1>Proof: Additive Inverse of a Binary Number</h1>
+
+    <p>
+        Let \(X\) be an \(n\)-bit binary integer represented in positional notation as:
+    </p>
+    \[X = \sum_{i=0}^{n-1} x_i \cdot 2^i, \quad \text{where } x_i \in \{0, 1\}\]
+
+    <h2>Bitwise Boolean Inverse</h2>
+    <p>
+        The bitwise boolean inverse (one's complement) \(\overline{X}\) flips every bit \(x_i\) from \(0\) to \(1\) or \(1\) to \(0\):
+    </p>
+    \[\overline{X} = \sum_{i=0}^{n-1} \overline{x}_i \cdot 2^i, \quad \text{where } \overline{x}_i = 1 - x_i\]
+
+    <h2>Sum of a Number and Its Inverse</h2>
+    <p>
+        Adding \(X\) and \(\overline{X}\) component-wise produces an \(n\)-bit value where every bit position contains \(1\):
+    </p>
+    \[X + \overline{X} = \sum_{i=0}^{n-1} x_i \cdot 2^i + \sum_{i=0}^{n-1} (1 - x_i) \cdot 2^i\]
+    \[X + \overline{X} = \sum_{i=0}^{n-1} (x_i + 1 - x_i) \cdot 2^i = \sum_{i=0}^{n-1} 1 \cdot 2^i\]
+    <p>
+        Using the geometric series identity \(\sum_{i=0}^{n-1} 2^i = 2^n - 1\):
+    </p>
+    \[X + \overline{X} = 2^n - 1\]
+
+    <h2>Additive Inverse Modulo \(2^n\)</h2>
+    <p>
+        In fixed-width \(n\)-bit binary arithmetic (two's complement representation operating modulo \(2^n\)), the additive inverse \(-X\) is defined as the unique value satisfying:
+    </p>
+    \[X + (-X) \equiv 0 \pmod{2^n}\]
+    <p>Algebraically, this represents:</p>
+    \[-X \equiv 2^n - X \pmod{2^n}\]
+
+    <h2>Algebraic Equivalence</h2>
+    <p>
+        Rearranging \(X + \overline{X} = 2^n - 1\) to isolate \(2^n - X\):
+    </p>
+    \[2^n - X = \overline{X} + 1\]
+    <p>
+        Substituting \(2^n - X\) into the modular expression for the additive inverse yields:
+    </p>
+    \[-X \equiv \overline{X} + 1 \pmod{2^n}\]
+    <p>
+        Thus, the additive inverse of an \(n\)-bit binary number \(X\) is equal to its bitwise boolean inverse \(\overline{X}\) plus \(1\).
+    </p>
+
+</body>
+</html>

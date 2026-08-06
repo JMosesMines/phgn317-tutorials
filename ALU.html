@@ -40,7 +40,8 @@
     <p>The 74181 is a relatively simple classic example of a standalone ALU IC.  Look over its data sheet, <a href="https://www.ti.com/lit/ds/symlink/sn54ls181.pdf">here</a>.</p>
 <script>
 (async () => {
-    const diagrams =[[
+
+  const diagrams =[[
     "\\begin{tikzpicture}[",
     ">=Stealth,",
     "font=\\sffamily,",
@@ -84,8 +85,13 @@ const [tikz1] = diagrams.map(item => [
 <main class="card">
     <h2>Practice Area</h2>
     <div class="controls">
-    <button onclick="generateProblem()">Generate Problem</button>
-    <button id="btn-solution" onclick="showSolution()" disabled>Reveal Solution</button>
+        <select id="problem-type">
+            <option value="predict-output">Predict Output</option>
+            <option value="configure-selection">Configure the Selection Pins for the required function</option>
+            <option value="conceptual-explanations">Conceptual Explanations</option>
+        </select>
+    <button id="generate-problem">Generate Problem</button>
+    <button id="btn-solution" disabled>Reveal Solution</button>
 
     <div id="problem-area" class="hidden">
         <div id="problem-statement"></div>
@@ -94,18 +100,34 @@ const [tikz1] = diagrams.map(item => [
 </main>
 
 <footer class="academic-footer">
-    <p>Developed by Josh Moses with engineering assistance from Google Gemini (July 2026).</p>
+    <p>Developed by Josh Moses with engineering assistance from Google Gemini (August 2026).</p>
 </footer>
 
-<script>
+<script type="module">
     let currentProblem = null;
+    let ALU_functions = [];
+
+    async function loadDiagrams() {
+        try {
+            const res = await fetch('ALU_functions.json');
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            ALU_functions = await res.json();
+        } catch (error) {
+            console.error('Failed to load diagrams:', error);
+        }
+    }
+
+    await loadDiagrams();
+
+    document.getElementById('generate-problem').addEventListener('click', generateProblem);
+    document.getElementById('btn-solution').addEventListener('click', showSolution);
 
     function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
     function generateProblem() {
-        // const type = document.getElementById('conversion-type').value;
+        const type = document.getElementById('problem-type').value;
         const problemArea = document.getElementById('problem-area');
         const statement = document.getElementById('problem-statement');
         const solutionArea = document.getElementById('solution-area');
@@ -116,30 +138,100 @@ const [tikz1] = diagrams.map(item => [
         problemArea.classList.remove('hidden');
         btnSolution.disabled = false;
 
-        const MODE_NAMES = ['L (Arithmetic Operations)', 'H (Logic Functions)'];
-        let mode = getRandomInt(0, 1);
-        let selection = getRandomInt(0,15);
-        let A = getRandomInt(0,15);
-        let B = getRandomInt(0,15);
-        
-        currentProblem = { mode, selection, A, B };
-        let questionText = `Given M = ${MODE_NAMES[mode]}, and Selection inputs S = ${selection.toString(2).padStart(4, '0')}<sub>2</sub>, determine the output F<sub>3</sub>F<sub>2</sub>F<sub>1</sub>F<sub>0</sub> for inputs A = ${A.toString(2).padStart(4, '0')}<sub>2</sub> and B = ${B.toString(2).padStart(4, '0')}<sub>2</sub>`;
-        
+        let i, questionText;
+
+        switch(type) {
+            case 'predict-output':
+                const MODE_NAMES = ['L (Arithmetic Operations)', 'H (Logic Functions)'];
+                let mode = getRandomInt(0, 1);
+                let selection = getRandomInt(0,15);
+                let A = getRandomInt(0,15);
+                let B = getRandomInt(0,15);
+                
+                currentProblem = { mode, selection, A, B };
+                questionText = `Given M = ${MODE_NAMES[mode]}, and Selection inputs S<sub>1</sub>S<sub>2</sub>S<sub>3</sub>S<sub>4</sub> = `;
+                questionText += toHLString(selection, 4);
+                questionText += `, determine the output F<sub>3</sub>F<sub>2</sub>F<sub>1</sub>F<sub>0</sub> for inputs A = ${A.toString(2).padStart(4, '0')}<sub>2</sub> and B = ${B.toString(2).padStart(4, '0')}<sub>2</sub>`;
+                questionText += `<p>Assume an Active-High interpretation of the data.</p>`;
+                break;
+            case 'configure-selection':
+                i = getRandomInt(0, ALU_functions.length);
+                currentProblem = ALU_functions[i];
+                if (currentProblem.type == "logic"){
+                    questionText = `<p>Determine the M and S`;
+                } else if (currentProblem.type == "arithmetic"){
+                    questionText = `<p>Determine the M, S, and C<sub>n</sub>` 
+                }
+                questionText += ` values needed to set the 74LS181 ALU to perform the ${currentProblem.type} operation: ${currentProblem.meaning} (${currentProblem.function })</p>`;
+                questionText += `<p>Assume an Active-High interpretation of the data.</p>`;
+                break;
+            case 'conceptual-explanations':
+                i = getRandomInt(0, 1);
+                currentProblem = i;
+                questionText = `<p>The data sheet linked above says, `;
+                switch(i){
+                    case 0:
+                        questionText += `at the very beginning, "Full Look-Ahead for High-Speed Operations on Long Words.`;
+                        break;
+                    case 1:
+                        questionText += `near the top of Page 2, "Subtraction is accomplished by 1's complement addition where the 1's complement of the subtrahend is generated internally.  The resultant output is A-B-1, which requires an end-around or forced carry to provide A-B.`;
+                        break;
+                }
+                questionText += `  What does this mean and why is it a good thing?</p>`;
+                break;
+        }
         statement.innerHTML = questionText;
     }
 
+    function toHLString(sValue, bitWidth = 4) {
+        let hlString = '';
+        for (let i = bitWidth - 1; i >= 0; i--){
+            hlString += (sValue & (1 << i)) ? 'H' : 'L';
+        }
+        return hlString;
+    }
     function showSolution() {
         const solutionArea = document.getElementById('solution-area');
+        const type = document.getElementById('problem-type').value;
+
         solutionArea.innerHTML = '';
         solutionArea.classList.remove('hidden');
         document.getElementById('btn-solution').disabled = true;
-        renderSolution(solutionArea);        
+        switch(type) {
+            case 'predict-output':
+                renderPredictOutput(solutionArea);
+                break;
+            case 'configure-selection':
+                renderConfigureSelection(solutionArea);
+                break;
+            case 'conceptual-explanations':
+                renderConceptualExplanation(solutionArea);
+        }        
     }
+    function renderConceptualExplanation(container){
+        let html;
+        switch(currentProblem){
+            case 0:
+                html = `<p>The ripple-carry adder circuit is slow because each bit place of the multi-bit addition operation has to wait for the carry bit of the next-less-significant stage to be produced, before it can begin calculating its own results.  Therefore the process of adding multi-bit operands suffers the entire propagation delay of each bit's logic in series.  The 74181 uses more gates than the ripple-carry adder, to incorporate all the input bits at once to quickly determine the carry values for every stage, using a parallel flow of logic.  This approach is called, "carry-lookahead".<\p>`
+                break;
+            case 1:
+                html = `<p>"1's complement" is just logical inversion of each bit in the binary number.  Examine the logic diagram on Page 5 of the data sheet.  Notice the inverters, right after the B0, B1, B2, and B3 inputs.  Notice that the output signals of these inverters go into AND gates.  Those AND gates are for selecting certain signals to be passed downstream for computation, depending on which of the Selection Bits are High.  Which Selection Bits are connected to the AND gates that the inverted B's are entering?  It's S1 and S2, right?  Now look at the Function Table on Page 4 (active-high data).  Find the row that performs the function, "A MINUS B"  Check the value of S1 and S2 for that row.  Both High, right?  This shows that subtraction is accomplished in this circuit, not by enabling a whole set of logic dedicated especially for subtraction, but by reusing the addition circuit, with the B bits inverted.  Thus the logic has been cleverly optimized for maximum functionality with minimum complexity.  The result of this is "A-B-1" but the circuit can add 1 to this by making use of the Carry In bit, to get "A-B".<\p>`;
+                break;
+        }
+        container.innerHTML = html;
+    }
+    function renderConfigureSelection(container){
+        let html = `<p>M: ${currentProblem.M}</p><p>S<sub>3</sub>S<sub>2</sub>S<sub>1</sub>S<sub>0</sub>: ${currentProblem.S}</p>`;
+        if (currentProblem.type = "arithmetic") {
+            html += `C<sub>n</sub>: ${currentProblem.Cn}`;
+        }
 
-    function renderSolution(container){
+        container.innerHTML = html;
+    }
+    function renderPredictOutput(container){
         const MODE_NAMES = ['Arithmetic Operation', 'Logic Function'];
         let solution = evaluate();
-        let html = `<p>Let's start by assuming an Active-High interpretation.  In the 74LS181 data sheet, find the table for "Active-High Data".  Then find the row corresponding to the given Selection code.  Look for this row:</p>`;
+        let html = `<p>In the 74LS181 data sheet, find the table for "Active-High Data".  Then find the row corresponding to the given Selection code.  Look for this row:</p>`;
         html += generateSelectTable(currentProblem.selection);
         html += `<p>That row shows that the ${MODE_NAMES[currentProblem.mode]} for this Selection code is ${solution.operationName}, with the result ${solution.binaryF}<sub>2</sub>`;
 

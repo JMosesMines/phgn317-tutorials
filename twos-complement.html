@@ -5,34 +5,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Two's Complement</title>
     <link rel="stylesheet" href="style.css">
-</head>
+    <link rel="stylesheet" href="fonts.css">
+<!-- KaTeX CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+
+  <!-- KaTeX JS -->
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+
+  <!-- Auto-render extension -->
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body);"></script></head>
 <body>
 
     <header class="card">
-        <h1>Understanding Two's Complement</h1>
-        <p>In standard binary, we can only represent positive numbers. To represent negative numbers, digital systems use the <strong>Two's Complement</strong> framework. This is an elegant design because it allows standard arithmetic hardware to handle addition and subtraction identically without needing separate subtractor circuits.</p>
-        
-        <p>In a signed 8-bit system, the absolute far-left bit (Most Significant Bit, or MSB) becomes the <strong>sign bit</strong>. Instead of representing a positive value (+128), it represents a negative value (-128).</p>
+        <h1>Two's Complement</h1>
+        <p>How should we represent negative numbers in binary?  In considering this question, we should consider what a "negative number" fundamentally is.  It is the <strong>additive inverse</strong> of a positive number.  That is:</p>
+        \[X + (-X) = 0\]
+        <p>So, we are looking for a binary number, \((-X)\), that we can add to a positive binary number, such that the sum is equal to zero.  Can we find such a number, without changing the process of addition?  To do so, remember that computers are finite.  As we increment or add to a binary number, we will eventually reach a magnitude limit.  For example, what happens if we increment 1111<sub>2</sub> by 1?  We get 10000<sub>2</sub>, right?  But what if only 4 bits of memory have been allocated to representing this integer?  Then the value will <em>overflow</em> from 10000<sub>2</sub> to just 0000<sub>2</sub>.  Ah!  We did it!  We found that 1<sub>2</sub> is indeed the <strong>additive inverse</strong> of 1111<sub>2</sub>.  This may not be obvious at first, but it is true, in a modulo 16, or \(\mod{2^4}\) system.  It is natural to interpret digitally represented numbers as \(\mod{2^n}\) systems, because of the fact that computer memory is finite.</p>
+        <p>To represent negative binary integers correctly, we must know the number of bits used to represent the integer.  In a 4-bit system, the additive inverse of 1 is 1111<sub>2</sub>.  In an 8-bit system, the additive inverse of 1 is 11111111<sub>2</sub>.  Can you find the additive inverse of 10<sub>2</sub>?  How about, of 11<sub>2</sub>?</p>
+        <p>We can use a simple algorithm to find the additive inverse, or negative, of any binary number.  Here it is.</p>
+        <!-- <p>In a signed 8-bit system, the absolute far-left bit (Most Significant Bit, or MSB) becomes the <strong>sign bit</strong>. Instead of representing a positive value (+128), it represents a negative value (-128).</p> -->
 
         <div class="highlight-box">
-            <h3>The Recipe for Negative Numbers</h3>
-            <p>To convert a negative decimal number to Two's Complement binary format:</p>
+            <h3>Two's Complement Additive Inversion</h3>
+            <p>To find the <strong>additive inverse</strong> of a number in Two's Complement format:</p>
             <ol>
-                <li>Write out the straight binary value of the <strong>positive version</strong> of the number. Ensure it is padded out to the fixed bit length (e.g., 8 bits).</li>
+                <li><strong>Convert to binary:</strong> Write the number in binary form. Pad it with zeros on the left to fill a certain fixed bit width (e.g., 8 bits).</li>
                 <li><strong>Invert all bits:</strong> Flip every 1 to a 0, and every 0 to a 1. (This is known as the One's Complement).</li>
-                <li><strong>Add 1:</strong> Perform binary addition by adding 1 to your inverted sequence.</li>
+                <li><strong>Add 1:</strong> Add 1 to your inverted binary value.</li>
             </ol>
         </div>
+        <p>Try it yourself.  Choose a positive number, and use this algorithm to find its additive inverse.  Then, use binary arithmetic to add the result to the original number.  Cut off any extra bits from the left, to limit the result to the original bit width.  Is the sum zero?</p>
+        <h3>Why does it work?</h3>
+        <p>When you add a binary number to its own <em>bitwise logical complement</em>, you are adding a 0 and a 1, in each binary place.  Thus, the result of this addition is always 1111...., for every bit of the fixed width \(n\).  In other words, adding \(X\) and \(\overline{X}\) produces an \(n\)-bit value where every bit position contains 1:</p>
+        \[X + \overline{X} = \sum_{i=0}^{n-1} 1 \cdot 2^i \]
+        <p>Using the geometric series identity \(\sum_{i=0}^{n-1} 2^i = 2^n -1\):</p>
+        \[X + \overline{X} = 2^n - 1\]
+        <p>Adding 1 to both sides:</p>
+        \[X + (\overline{X} + 1) = 2^n\]
+        <p>In a \(\mod{2^n}\) system,</p>
+        \[2^n \equiv 0\]
+        <p>So</p>
+        \[X + (\overline{X} + 1) \equiv 0\]
+        <p>Remembering the definition:</p>
+        \[X + (-X) = 0\]
+        <p>Leaves:</p>
+        \[-X \equiv \overline{X} + 1\]
+        <p>Q.E.D.</p>
+        <h3>Subtraction</h3>
+        <p>Now that we have a formula for the <strong>additive inverse</strong> of binary numbers, we can do subtraction operations by using:</p>
+        \[A - B = A + (-B)\]
+        <p>or:</p>
+        \[A - B = A + (\overline{B} + 1)\]
     </header>
 
     <main class="card">
         <h2>Practice Area</h2>
-        <p>Practice converting values to and from signed 8-bit Two's Complement notation.</p>
-        
         <div class="controls">
             <select id="conversion-type">
                 <option value="dec-to-twos">Decimal to 8-Bit Two's Complement</option>
                 <option value="twos-to-dec">8-Bit Two's Complement to Decimal</option>
+                <option value="subtraction">Subtraction</option>
             </select>
             <button onclick="generateProblem()">Generate Problem</button>
             <button id="btn-solution" onclick="showSolution()" disabled>Reveal Solution</button>
@@ -76,6 +109,9 @@
             }
         }
 
+        function subtraction(A,B) {
+
+        }
         function generateProblem() {
             const type = document.getElementById('conversion-type').value;
             const problemArea = document.getElementById('problem-area');
@@ -90,15 +126,24 @@
 
             let num, questionText;
 
-            if (type === 'dec-to-twos') {
-                num = getRandomInt(-128, -1);
-                currentProblem = { num: num, type: type };
-                questionText = `Convert the signed Decimal number <span style="color:#e67e22;">${num}</span> to an 8-Bit Two's Complement binary sequence.`;
-            } else {
-                let randomDec = getRandomInt(-128, 127);
-                let binStr = toTwosComplement8Bit(randomDec);
-                currentProblem = { num: binStr, type: type, target: randomDec };
-                questionText = `Convert the 8-Bit Two's Complement binary number <span class="binary-text">${binStr}</span> to its signed Decimal equivalent.`;
+            switch (type){
+                case 'dec-to-twos':
+                    num = getRandomInt(-128, -1);
+                    currentProblem = { num: num, type: type };
+                    questionText = `Convert the signed Decimal number <span style="color:#e67e22;">${num}</span> to an 8-Bit Two's Complement binary sequence.`;
+                    break;
+                case 'twos-to-dec':
+                    let randomDec = getRandomInt(-128, 127);
+                    let binStr = toTwosComplement8Bit(randomDec);
+                    currentProblem = { num: binStr, type: type, target: randomDec };
+                    questionText = `Convert the 8-Bit Two's Complement binary number <span class="binary-text">${binStr}</span> to its signed Decimal equivalent.`;
+                    break;
+                case 'subtraction':
+                    let A = getRandomInt(-128,127);
+                    let B = getRandomInt(0,127);
+                    currentProblem = {type, A, B};
+                    questionText = `Convert the 2 decimal numbers to 8-Bit Two's Complement Binary.  Then perform the subtraction.  Convert the binary result back to decimal to confirm the result is correct.<br> <span style="color:#e67e22;">${A}-${B}=</span>`;
+                    break;
             }
 
             statement.innerHTML = questionText;
@@ -109,14 +154,42 @@
             solutionArea.innerHTML = '';
             solutionArea.classList.remove('hidden');
             document.getElementById('btn-solution').disabled = true;
-
-            if (currentProblem.type === 'dec-to-twos') {
-                renderDecToTwos(currentProblem.num, solutionArea);
-            } else {
-                renderTwosToDec(currentProblem.num, currentProblem.target, solutionArea);
+            
+            switch (currentProblem.type){
+                case 'dec-to-twos':
+                    renderDecToTwos(currentProblem.num, solutionArea);
+                break;
+                case 'twos-to-dec':
+                    renderTwosToDec(currentProblem.num, currentProblem.target, solutionArea);
+                break;
+                case 'subtraction':
+                    renderSubtraction(currentProblem.A, currentProblem.B, solutionArea);            
             }
         }
 
+        function renderSubtraction(A, B, container){
+            let binStrA = toTwosComplement8Bit(A);
+            let binStrB = toTwosComplement8Bit(B);
+            let binStrMinusB = toTwosComplement8Bit(-B);
+            let binStrAMinusB = toTwosComplement8Bit(A-B);
+
+            let html = `<h3>Step-by-Step</h3>`;
+
+
+            html += `<table>
+                        <tr><th>Step</th><th>Description</th><th>Value</th></tr>
+                        <tr><td>1</td><td>Convert the 2 decimal numbers to 8-Bit Two's Complement Binary</td><td class="binary-text">${binStrA} - ${binStrB}</td></tr>
+                        <tr><td>2</td><td>Find (-B), the additive inverse of the subrahend</td><td class="binary-text">${binStrMinusB}</td></tr>
+                        <tr><td>3</td><td>Compute the sum: A+(-B), discarding the 9<sup>th</sup> (overflow) bit, if any</td><td class="binary-text">${binStrAMinusB}</td></tr>`;
+            let Answer = A-B;
+            if (Answer < -128){Answer += 256;}
+            html += `<tr><td>4</td><td>Convert back to decimal to verify</td><td>${Answer}</td></tr>`;
+            if (A-B < -128){
+                html += `<tr><td>5</td><td>It is possible, as in this case, that the true difference could fall outside the range bounds of 8-Bit numbers.  If the range were unlimited, we would say that ${A} - ${B} = ${A-B}, but ${A-B} cannot be represented in just 8 bits.  So since the machine is finite, the result will be ${A-B} mod 2<sup>8</sup>, which is indeed: <td>${Answer}</td></tr>`;
+            }
+            html += `</table>`;
+            container.innerHTML = html;            
+        }
         function renderDecToTwos(num, container) {
             let absVal = Math.abs(num);
             let posBin = absVal.toString(2).padStart(8, '0');

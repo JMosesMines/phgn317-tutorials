@@ -1,0 +1,158 @@
+[
+{
+    "type": "logic",
+    "function": "F = NOT A",
+    "meaning": "Bitwise NOT A",
+    "S": "LLLL",
+    "M": "H"
+},
+{
+    "type": "logic",
+    "function": "F = NOT(A + B)",
+    "meaning": "Bitwise NOR",
+    "S": "LLLH",
+    "M": "H"
+},
+{
+    "type": "logic",
+    "function": "F = NOT(A * B)",
+    "meaning": "Bitwise NAND",
+    "S": "LHLL",
+    "M": "H"
+},
+{
+    "type": "logic",
+    "function": "F = NOT B",
+    "meaning": "Bitwise NOT B",
+    "S": "LHLH",
+    "M": "H"
+},
+{
+    "type": "logic",
+    "function": "F = A XOR B",
+    "meaning": "Bitwise XOR",
+    "S": "LHHL",
+    "M": "H"
+},
+{
+    "type": "logic",
+    "function": "F = A XNOR B",
+    "meaning": "Bitwise XNOR",
+    "S": "HLHL",
+    "M": "H"
+},
+{
+    "type": "logic",
+    "function": "F = B",
+    "meaning": "Pass B",
+    "S": "HLHH",
+    "M": "H"
+},
+{
+    "type": "logic",
+    "function": "F = A AND B",
+    "meaning": "Bitwise AND",
+    "S": "HHLH",
+    "M": "H"
+},
+{
+    "type": "logic",
+    "function": "F = A OR B",
+    "meaning": "Bitwise OR",
+    "S": "HHHL",
+    "M": "H"
+},
+{
+    "type": "logic",
+    "function": "F = A",
+    "meaning": "Pass A",
+    "S": "HHHH",
+    "M": "H"
+},
+{
+    "type": "logic",
+    "function": "F = 0000",
+    "meaning": "Clear (Logical 0)",
+    "S": "LLHH",
+    "M": "H"
+},
+{
+    "type": "logic",
+    "function": "F = 1111",
+    "meaning": "Set (Logical 1)",
+    "S": "HLLL",
+    "M": "H"
+},
+{
+    "type": "arithmetic",
+    "function": "F = A",
+    "meaning": "Transfer A",
+    "S": "LLLL",
+    "M": "L",
+    "Cn": "H"
+},
+{
+    "type": "arithmetic",
+    "function": "F = A + 1",
+    "meaning": "Increment A",
+    "S": "LLLL",
+    "M": "L",
+    "Cn": "L"
+},
+{
+    "type": "arithmetic",
+    "function": "F = A - B - 1",
+    "meaning": "Subtract with Borrow",
+    "S": "LHHL",
+    "M": "L",
+    "Cn": "H"
+},
+{
+    "type": "arithmetic",
+    "function": "F = A - B",
+    "meaning": "Two's Complement Subtract",
+    "S": "LHHL",
+    "M": "L",
+    "Cn": "L"
+},
+{
+    "type": "arithmetic",
+    "function": "F = A + B",
+    "meaning": "Addition",
+    "S": "HLLH",
+    "M": "L",
+    "Cn": "H"
+},
+{
+    "type": "arithmetic",
+    "function": "F = A + B + 1",
+    "meaning": "Add with Carry",
+    "S": "HLLH",
+    "M": "L",
+    "Cn": "L"
+},
+{
+    "type": "arithmetic",
+    "function": "F = 2A",
+    "meaning": "Shift Left (A + A)",
+    "S": "HHLL",
+    "M": "L",
+    "Cn": "H"
+},
+{
+    "type": "arithmetic",
+    "function": "F = 2A + 1",
+    "meaning": "Shift Left with Carry-in",
+    "S": "HHLL",
+    "M": "L",
+    "Cn": "L"
+},
+{
+    "type": "arithmetic",
+    "function": "F = A - 1",
+    "meaning": "Decrement A",
+    "S": "HHHH",
+    "M": "L",
+    "Cn": "H"
+}
+]
