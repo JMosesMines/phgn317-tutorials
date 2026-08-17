@@ -37,7 +37,12 @@
         </span>
         </figcaption>
     </figure>
-    <p>The 74181 is a relatively simple classic example of a standalone ALU IC.  Look over its data sheet, <a href="https://www.ti.com/lit/ds/symlink/sn54ls181.pdf">here</a>.</p>
+    <p>The 74181 is a relatively simple classic example of a standalone ALU IC.  The same basic design is made by multiple manufacturers.  Different manufacturers explain the device in different ways, on their datasheets, so to fully understand its details, it will probably help to consult more than one version of the datasheet.  Here they are:
+        <ul>
+            <li><a href="docs/TI_74LS181.pdf" target="_blank">Texas Instruments</a></li>
+            <li><a href="docs/Motorola_74LS181.PDF" target="_blank">Motorola</a></li>
+            <li><a href="docs/Fairchild_74LS181.PDF" target="_blank">Fairchild</a></li>
+        </ul>
 <script>
 (async () => {
 
@@ -166,19 +171,27 @@ const [tikz1] = diagrams.map(item => [
                 questionText += `<p>Assume an Active-High interpretation of the data.</p>`;
                 break;
             case 'conceptual-explanations':
-                i = getRandomInt(0, 1);
+                i = getRandomInt(0, 3);
                 currentProblem = i;
-                questionText = `<p>The data sheet linked above says, `;
+                questionText = `<p>Find where the datasheet mentions `;
                 switch(i){
                     case 0:
-                        questionText += `at the very beginning, "Full Look-Ahead for High-Speed Operations on Long Words.`;
+                        questionText += `the idea of "carry lookahead".  `;
+                        questionText += `What does this mean and why is it a good thing?`;
                         break;
                     case 1:
-                        questionText += `near the top of Page 2, "Subtraction is accomplished by 1's complement addition where the 1's complement of the subtrahend is generated internally.  The resultant output is A-B-1, which requires an end-around or forced carry to provide A-B.`;
+                        questionText += `how subtraction is accomplished through 1s complement addition.  `;
+                        questionText += `What does this mean and why is it a good thing?`;
                         break;
-                }
-                questionText += `  What does this mean and why is it a good thing?</p>`;
-                break;
+                    case 2:
+                        questionText += `the functions of pins 15 and 17: P&#x0305 and G&#x0305, respectively.  `;
+                        questionText += `What are these signals for?`;
+                        break;
+                    case 3:
+                        questionText += `that pin 14, A=B, is Open Collector.  `;
+                        questionText += `What does this mean and why is it a good thing?`;
+               }
+               questionText += `</p>`;
         }
         statement.innerHTML = questionText;
     }
@@ -212,10 +225,16 @@ const [tikz1] = diagrams.map(item => [
         let html;
         switch(currentProblem){
             case 0:
-                html = `<p>The ripple-carry adder circuit is slow because each bit place of the multi-bit addition operation has to wait for the carry bit of the next-less-significant stage to be produced, before it can begin calculating its own results.  Therefore the process of adding multi-bit operands suffers the entire propagation delay of each bit's logic in series.  The 74181 uses more gates than the ripple-carry adder, to incorporate all the input bits at once to quickly determine the carry values for every stage, using a parallel flow of logic.  This approach is called, "carry-lookahead".<\p>`
+                html = `<p>The ripple-carry adder circuit is slow because each bit place of the multi-bit addition operation has to wait for the carry bit of the next-less-significant stage to be produced, before it can begin calculating its own results.  Therefore the process of adding multi-bit operands suffers the entire propagation delay of each bit's logic in series.  The 74181 uses more gates than the ripple-carry adder, to incorporate all the input bits at once to quickly determine the carry values for every stage, using a parallel flow of logic.  This approach is called, "carry lookahead".</p>`;
                 break;
             case 1:
-                html = `<p>"1's complement" is just logical inversion of each bit in the binary number.  Examine the logic diagram on Page 5 of the data sheet.  Notice the inverters, right after the B0, B1, B2, and B3 inputs.  Notice that the output signals of these inverters go into AND gates.  Those AND gates are for selecting certain signals to be passed downstream for computation, depending on which of the Selection Bits are High.  Which Selection Bits are connected to the AND gates that the inverted B's are entering?  It's S1 and S2, right?  Now look at the Function Table on Page 4 (active-high data).  Find the row that performs the function, "A MINUS B"  Check the value of S1 and S2 for that row.  Both High, right?  This shows that subtraction is accomplished in this circuit, not by enabling a whole set of logic dedicated especially for subtraction, but by reusing the addition circuit, with the B bits inverted.  Thus the logic has been cleverly optimized for maximum functionality with minimum complexity.  The result of this is "A-B-1" but the circuit can add 1 to this by making use of the Carry In bit, to get "A-B".<\p>`;
+                html = `<p>"1's complement" is just logical inversion of each bit in the binary number.  Examine the logic diagram shown in the data sheet.  Notice the inverters, right after the B0, B1, B2, and B3 inputs.  Notice that the output signals of these inverters go into AND gates.  Those AND gates are for selecting certain signals to be passed downstream for computation, depending on which of the Selection Bits are High.  Which Selection Bits are connected to the AND gates that the inverted B's are entering?  It's S1 and S2, right?  Now look at the Function Table on Page 4 (active-high data).  Find the row that performs the function, "A MINUS B"  Check the value of S1 and S2 for that row.  Both High, right?  This shows that subtraction is accomplished in this circuit, not by enabling a whole set of logic dedicated especially for subtraction, but by reusing the addition circuit, with the B bits inverted.  Thus the logic has been cleverly optimized for maximum functionality with minimum complexity.  The result of this is "A-B-1" but the circuit can add 1 to this by making use of the Carry In bit, to get "A-B".</p>`;
+                break;
+            case 2:
+                html = `<p>Several 74LS181 IC's can work together to perform calculations on numbers more than 4 bits wide.  Of course, a Carry Out signal is needed, to send the Carry value to the next more significant stage of the multi-bit calculation.  But, the Carry Out signal is not available until the whole calculation is complete.  The Carry Propagate and Carry Generate signals are produced faster than the Carry Out signal, so that the speed advantages of Carry Lookahead can extend across multiple nibbles of a calculation.</p>`;
+                break;
+            case 3:
+                html = `<p>"Open Collector" is a type of output circuit that can only sink current; it cannot source current.  To get a High logic-level voltage from the ouput, you have to add an external pullup resistor.  One great advantage of the Open Collector design is that several Open Collector outputs can be connected together with a single pullup resistor to form a "Wired-AND".  This would be the ideal arrangement for connecting the "A=B" comparison outputs from several ALU's together, for comparing numbers wider than 4 bits.  Totem-pole outputs would cause bus contention if wired together.</p>`;  
                 break;
         }
         container.innerHTML = html;

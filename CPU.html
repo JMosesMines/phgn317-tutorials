@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central Processing Unit</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="fonts.css">
+    <style>
+        .alu-table {
+        border-collapse: collapse;
+        text-align: center;
+        font-family: monospace;
+        }
+
+        .alu-table th, 
+        .alu-table td {
+        border: 1px solid #ccc;
+        padding: 4px 8px;
+        }
+    </style>
+    <!-- Tell TikZJax where your assets are -->
+    <script>
+        window.TikZJaxConfig = {
+        assets: { wasm: 'tex.wasm.gz', core: 'core.dump.gz' }
+        };
+    </script>
+</head>
+<body>
+<script type="module" src="./cpu-tutorial/src/CpuSimulator.jsx"></script>
+<header class="card">
+    <h1>Central Processing Unit</h1>
+    <p>An ALU can do several different logical and arithmetic operations, but it is far from a fully automatic machine.  From where does it get its operands?  To where does it store its results?  What controls its operational sequence?  All this is done by a <strong>Central Processing Unit</strong>, whose core is an ALU.  The <strong>CPU</strong> also includes a <strong>Control Unit</strong>, and a set of <strong>Registers</strong>, which each have a special function.  The CPU <strong>Control Unit</strong> is a <em>Finite State Machine</em> that controls everything else.</p>
+    <figure class="media-container">
+        <div id="CPU" class="tutorial-media" style="max-width: 800px;"></div>
+        <figcaption>Central Processing Unit</figcaption>
+    </figure>
+    <p>The <strong>registers</strong> in the CPU each have a critical job.</p>
+    <table border="1" cellpadding="6" cellspacing="0">
+    <tr>
+        <th>Register</th>
+        <th>Name</th>
+        <th>Purpose</th>
+    </tr> <tr>
+        <td>PC</td>
+        <td>Program Counter</td>
+        <td>Contains the address of the next instruction to be fetched.</td>
+    </tr> <tr>
+        <td>IR</td>
+        <td>Instruction Register</td>
+        <td>Contains the instruction currently being executed.</td>
+    </tr> <tr>
+        <td>ACC</td>
+        <td>Accumulator</td>
+        <td>Working register used by the ALU to store operands and results.</td>
+    </tr> <tr>
+        <td>MAR</td>
+        <td>Memory Address Register</td>
+        <td>Contains the address currently being accessed in memory.</td>
+    </tr> <tr>
+        <td>MDR</td>
+        <td>Memory Data Register</td>
+        <td>Contains data being transferred between the CPU and memory.</td>
+    </tr>
+    </table>
+    <h3>Fetch-Decode-Execute</h3>
+    <p>The CPU repeatedly cycles though three main steps:</p>
+    <ol><li><strong>Fetch</strong> an instruction from memory</li>
+    <li><strong>Decode</strong> the instruction, to see what data it needs for its operation</li>
+    <li><strong>Execute</strong> the instruction.  The execution is performed by the ALU, when triggered by the <strong>Control Unit</strong></li>
+    </ol>
+    <p>In performing these steps, memory addresses and working data are transmitted through the CPU between its registers, on the CPU's <strong>internal bidirectional busses</strong>.  The main job of the <strong>Control Unit</strong> is to synchronize the <strong>Read Enable</strong> and <strong>Write Enable</strong> signals that control access to the bidirectional busses.</p>
+    <h3>Instruction Set</h3>
+    <p>The <strong>Instruction Set</strong> is the list of instructions, or <strong>opcodes</strong>, that the ALU is designed to execute.  A sequence of these simple operations can be systematically composed to accomplish complex calculations.  The instruction set is the bridge between a computer's hardware and its software.  The instruction set would include, for example, opcodes to fetch data from memory, perform an operation on the data, and store the result of the operation back into memory.</p>
+    <p>Adding a bit more detail to our diagram, here is an animation showing each substep of a simple three step program</p>
+    <figure class="media-container">
+        <div id="animated-CPU" class="tutorial-media" style="max-width: 800px;"></div>
+        <figcaption>Central Processing Unit</figcaption>
+    </figure>
+    
+
+<script>
+(async () => {
+    const diagrams =[[
+        '\\begin{tikzpicture}[>=Stealth,font=\\sffamily,>=Latex, memory/.style={draw,line width=2pt,minimum width=3cm,minimum height=5cm,align=center}]',
+        '\\tikzset{ externalbus/.style={ draw=MinesLightBlue, double, double distance=12pt, line width=1pt, double=MinesLightBlue, >={Stealth[length=10mm,width=12mm]} }}',
+        '\\tikzset{ internalbus/.style={ draw=MinesLightBlue, line width=2.5pt}}',
+        '\\tikzset{ block/.style={draw, thick, minimum width=2.2cm, minimum height=1.5cm, align=center, fill=white}}',
+        '\\node[block] (ir) at (0,0) {Instruction\\\\Register};',
+        '\\node[block, fill=EnvironmentGreen] (cu) at (3,0) {Control\\\\Unit};',
+        '\\node[block] (pc) at (0,-2) {Program\\\\Counter};',
+        '\\node[block] (mar) at (3,-2) {Address\\\\Register};',
+        // '\\node[block] (ir) at (0,-2) {IR};',
+        '\\node[block] (acc) at (0,2) {Accumulator};',
+        '\\node[block, minimum height=5cm, fill=GoldenTech] (alu) at (-3,0) {Arithmetic\\\\Logic\\\\Unit};',
+        '\\node[block, minimum height=4cm] (registers) at (-6,0) {Other\\\\Registers};',
+        '\\node[block] (mdr) at (3,2) {Data\\\\Register};',
+
+        '\\node[block,minimum width=2.8cm,minimum height=6cm, fill=MinesDarkBlue] (mem) at (8.6,0) {};',
+        '\\node[block, minimum height=5cm, fill=MinesPaleBlue] at (mem.center) {Memory};',
+        
+        '\\draw[externalbus,->] (cu.east) -- (7.5,0) node[midway,above=-7pt]{Control Bus};',
+        '\\draw[externalbus,<->] (mdr.east) -- (7.5,2) node[midway,above=-7pt]{Data Bus};',
+        '\\draw[externalbus,->] (mar.east) -- (7.5,-2) node[midway,above=-7pt]{Address Bus};',
+        '\\draw[internalbus] (cu.west) -- (ir.east);',
+        '\\draw[internalbus] (mar.west) -- (pc.east);',
+        '\\draw[internalbus] (mdr.west) -- (1.1,2);',
+        '\\draw[internalbus] (acc.west) -- (-1.9,2);',
+        '\\draw[internalbus] (alu.west) -- (registers.east);',
+        '\\draw[internalbus] (alu.east) -- (ir.west);',
+        '\\draw[internalbus] (1.1,0.4) -- (1.9,1.7);',
+        // '\\draw[internalbus] (ir.east) -- (-1.1,0);',
+        '\\draw[internalbus] (pc.west) -- (-1.9,-2);',
+        '\\begin{scope}[on background layer]',
+        '\\node[draw,thick,fit=(cu)(pc)(mar)(acc)(alu)(mdr)(registers),inner sep=10pt,fill=MinesDarkBlue,label=above:{CPU}] {};',
+        '\\end{scope}',
+        '\\end{tikzpicture}'
+    ]];
+    const [tikz1] = diagrams.map(item => [
+        '\\usepackage{tikz}',
+        '\\usetikzlibrary{positioning,arrows.meta,fit,backgrounds}',
+        '\\usepackage{amsmath}',
+        '\\usepackage[american]{circuitikz}',
+        '\\usetikzlibrary{calc}',
+        '\\definecolor{MinesDarkBlue}{HTML}{21314D}',
+        '\\definecolor{MinesLightBlue}{HTML}{92A2BD}',
+        '\\definecolor{BlasterBlue}{HTML}{09396C}',
+        '\\definecolor{ColoradoRed}{HTML}{CC4628}',
+        '\\definecolor{MinesPaleBlue}{HTML}{CFDCE9}',
+        '\\definecolor{EnergyYellow}{HTML}{F0F600}',
+        '\\definecolor{GoldenTech}{HTML}{F1B91A}',
+        '\\definecolor{EnvironmentGreen}{HTML}{80C342}',
+        '\\pgfdeclarelayer{background}',
+        '\\pgfdeclarelayer{foreground}',
+        '\\pgfsetlayers{background,main,foreground}',
+        '\\begin{document}',
+        ...item,
+        '\\end{document}'
+    ].join('\n'));
+    // Inject TikZ first
+    const s1 = document.createElement('script');
+    s1.type = 'text/tikz';
+    s1.textContent = tikz1;
+    CPU.appendChild(s1);
+    // Then load tikzjax.js (autostart). Use a cache-buster so it executes each time.
+    const t = document.createElement('script');
+    t.src = 'tikzjax.js?cb=' + Date.now();
+    document.head.appendChild(t);
+
+})();
+
+</script>
+</header>
+
+<footer class="academic-footer">
+    <p>Developed by Josh Moses with engineering assistance from Microsoft Copilot (August 2026).</p>
+</footer>
+</body>
+</html>

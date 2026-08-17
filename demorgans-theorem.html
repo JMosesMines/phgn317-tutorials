@@ -154,6 +154,47 @@
 
         function renderEvaluationSolution(prob, container) {
             let ans = prob.calcOrig(prob.a, prob.b);
+            let altAns = prob.calcEquiv(prob.a, prob.b);
+            let notA = prob.a === 1 ? 0 : 1;
+            let notB = prob.b === 1 ? 0 : 1;
+
+            // Step-by-step trace of the original expression
+            let decompHtml = "";
+            if (prob.origHtml.includes("A &bull; B")) {
+                decompHtml = `<span class="bar">${prob.a} &bull; ${prob.b}</span> &rArr; <span class="bar">${prob.a && prob.b}</span> &rArr; <strong>${ans}</strong>`;
+            } else if (prob.origHtml.includes("A + B")) {
+                decompHtml = `<span class="bar">${prob.a} + ${prob.b}</span> &rArr; <span class="bar">${prob.a || prob.b}</span> &rArr; <strong>${ans}</strong>`;
+            } else if (prob.origHtml.includes('class="bar">A</span> &bull; B')) {
+                decompHtml = `<span class="bar"><span class="bar">${prob.a}</span> &bull; ${prob.b}</span> &rArr; <span class="bar">${notA} &bull; ${prob.b}</span> &rArr; <span class="bar">${notA && prob.b}</span> &rArr; <strong>${ans}</strong>`;
+            } else {
+                decompHtml = `<span class="bar">${prob.a} + <span class="bar">${prob.b}</span></span> &rArr; <span class="bar">${prob.a} + ${notB}</span> &rArr; <span class="bar">${prob.a || notB}</span> &rArr; <strong>${ans}</strong>`;
+            }
+
+            // Step-by-step trace of the DeMorgan equivalent shortcut expression
+            let altDecompHtml = "";
+            if (prob.equivHtml.includes('<span class="bar">A</span> + <span class="bar">B</span>')) {
+                altDecompHtml = `<span class="bar">${prob.a}</span> + <span class="bar">${prob.b}</span> &rArr; ${notA} + ${notB} &rArr; <strong>${altAns}</strong>`;
+            } else if (prob.equivHtml.includes('<span class="bar">A</span> &bull; <span class="bar">B</span>')) {
+                altDecompHtml = `<span class="bar">${prob.a}</span> &bull; <span class="bar">${prob.b}</span> &rArr; ${notA} &bull; ${notB} &rArr; <strong>${altAns}</strong>`;
+            } else if (prob.equivHtml.includes('A + <span class="bar">B</span>')) {
+                altDecompHtml = `${prob.a} + <span class="bar">${prob.b}</span> &rArr; ${prob.a} + ${notB} &rArr; <strong>${altAns}</strong>`;
+            } else {
+                altDecompHtml = `<span class="bar">${prob.a}</span> &bull; ${prob.b} &rArr; ${notA} &bull; ${prob.b} &rArr; <strong>${altAns}</strong>`;
+            }
+
+            let html = `<h3>Arithmetic Trace Map</h3>`;
+            html += `<p><strong>1. Direct Evaluation (Original Form):</strong></p>`;
+            html += `<p style="text-align:center; padding:12px; background:#f9f9f9; border-radius:6px;">${decompHtml}</p>`;
+            
+            html += `<p><strong>2. DeMorgan Shortcut Alternative Path (${prob.equivHtml}):</strong></p>`;
+            html += `<p style="text-align:center; padding:12px; background:#f5eef8; border-radius:6px;">${altDecompHtml}</p>`;
+
+            html += `<div class="final-answer">Final Evaluated State: Y = ${ans}</div>`;
+            container.innerHTML = html;
+        }
+/*
+        function renderEvaluationSolution(prob, container) {
+            let ans = prob.calcOrig(prob.a, prob.b);
             let decompHtml = "";
             let notA = prob.a === 1 ? 0 : 1;
             let notB = prob.b === 1 ? 0 : 1;
@@ -179,7 +220,8 @@
 
             html += `<div class="final-answer">Final Evaluated State: Y = ${ans}</div>`;
             container.innerHTML = html;
-        }   
+        } 
+*/  
     </script>
 </body>
 </html>

@@ -1,0 +1,387 @@
+import { useState, useEffect } from "react";
+import {
+  COLORS,
+  components,
+  connections,
+  controlConnections,
+} from "./cpuConstants";
+
+export function getSignalColor(signal) {
+return (
+    (signal.endsWith("_OUT") ? COLORS.readEnable : 
+    ((signal.endsWith("_IN") || signal.endsWith("_INC"))  ? COLORS.writeEnable :
+        COLORS.inactiveControl)));}
+
+export default function CpuDiagram({currentStep}) {
+
+  const [phase, setPhase] = useState(0);
+    useEffect(() => {
+    const timer = setInterval(() => {
+      setPhase((p) => (p + 0.02) % 1);
+    }, 20);
+
+    return () => clearInterval(timer);
+  }, []);
+
+    const activeConnection = connections.find(
+        ({from, to}) =>
+        from === currentStep.source &&
+        to === currentStep.destination
+    );
+    function getEndpoints(conn) {
+    // const left = components[from];
+    // const right = components[to];
+
+    // console.log("left =", left);
+    // console.log("right =", right);
+
+    const fromComp = components[conn.from];
+    const toComp = components[conn.to];
+    let y1, y2;
+    if ("anchor" in conn){
+        const anchorComp = components[conn.anchor];
+        y1 = anchorComp.y + anchorComp.h / 2;
+        y2 = y1;
+    } else {
+        y1 = fromComp.y + fromComp.h / 2;
+        y2 = toComp.y + toComp.h / 2; 
+    }
+
+    return {
+    x1:
+    conn.fromSide === "left"
+        ? fromComp.x
+        : conn.fromSide === "right"
+        ? fromComp.x + fromComp.w
+        : fromComp.x + fromComp.w / 2,
+      y1: y1,
+    x2:
+    conn.toSide === "left"
+        ? toComp.x
+        : conn.toSide === "right"
+        ? toComp.x + toComp.w
+        : toComp.x + toComp.w / 2,
+          y2: y2,
+    };}
+    
+    const endpoints =
+        activeConnection &&
+        getEndpoints(activeConnection)
+  
+  function isActive(blockName) {
+    return currentStep.activeBlocks.includes(blockName);
+  }
+  function isConnectionActive(conn) {
+    if (!currentStep.activeConnections) {
+      return false;
+    }
+    return currentStep.activeConnections.some(
+      ([from, to]) =>
+        from === conn.from && to === conn.to
+    );}
+
+  function isControlConnectionActive(conn) {
+    if (!currentStep.activeSignals) {
+      return false;
+    }
+    return currentStep.activeSignals.some((signal) =>
+      signal.startsWith(conn.to)
+    );}
+  function getSignalColor(signal) {
+    return (
+        (signal.endsWith("_OUT") ? COLORS.readEnable : 
+        ((signal.endsWith("_IN") || signal.endsWith("_INC"))  ? COLORS.writeEnable :
+            COLORS.inactiveControl)));}
+  function isTransfer(source, destination) {
+    return (
+      currentStep.source === source &&
+      currentStep.destination === destination
+    );}
+  function RenderConnection(conn, index){
+    const p = getEndpoints(conn);
+    if (conn.path){
+        return(
+            <polyline
+                key={`ctrl-${index}`}
+                points={conn.path
+                    .map(p => `${p.x},${p.y}`)
+                    .join(" ")}
+                fill="none"
+                stroke={
+                isConnectionActive(conn)
+                    ? COLORS.active
+                    : COLORS.minesLightBlue
+                }
+                strokeWidth={
+                isConnectionActive(conn)
+                    ? 6
+                    : 3
+                }
+            /> );
+        }
+        return(
+            <line
+                key={index}
+                // x1={conn.x1}
+                // y1={conn.y1}
+                // x2={conn.x2}
+                // y2={conn.y2}
+                // x1={components[conn.from].x + components[conn.from].w /2}
+                // y1={components[conn.from].y + components[conn.from].h /2}
+                // x2={components[conn.to].x + components[conn.to].w /2}
+                // y2={components[conn.to].y + components[conn.to].h /2}
+                x1={p.x1}
+                y1={p.y1}
+                x2={p.x2}
+                y2={p.y2}
+                stroke={
+                isConnectionActive(conn)
+                    ? COLORS.active
+                    : COLORS.minesLightBlue
+                }
+                strokeWidth={
+                isConnectionActive(conn)
+                    ? 6
+                    : 3
+                }
+            />);    
+        }
+  function RenderControlConnection(conn, index){
+            if(conn.path){
+                return(
+                    <polyline
+                        key={`ctrl-${index}`}
+                        points={conn.path
+                            .map(p => `${p.x},${p.y}`)
+                            .join(" ")}
+                        fill="none"
+                        stroke={isControlConnectionActive(conn) ? getSignalColor(conn.to) : COLORS.environmentGreen}
+                        strokeWidth={isControlConnectionActive(conn) ? 3 : 1}
+                        opacity={isControlConnectionActive(conn) ? 1.0 : 0.4}
+                    />);}
+                return(
+                    <line
+                        key={`ctrl-${index}`}
+                        x1={conn.x1}
+                        y1={conn.y1}
+                        x2={conn.x2}
+                        y2={conn.y2}
+                        stroke={isControlConnectionActive(conn) ? getSignalColor(conn.to) : COLORS.environmentGreen}
+                        strokeWidth={isControlConnectionActive(conn) ? 3 : 1}
+                        opacity={isControlConnectionActive(conn) ? 1.0 : 0.4}
+                    />);
+            }
+//   function getSignalClass(signal) {
+//     return (
+//         (signal.endsWith("_OUT") ? "readEnable" : 
+//         (signal.endsWith("_IN") ? "writeEnable" :
+//             "inactiveControl")));}
+    return (
+    <svg 
+        width="100%" 
+        height="100%" 
+        viewBox="25 0 880 425" 
+        // style={{backgroundColor: "#ffeeee"}}
+    >
+    <defs>
+    <marker
+        id="arrowhead"
+        markerWidth="4"
+        markerHeight="5"
+        refX="2"
+        refY="2"
+        orient="auto-start-reverse"
+    >
+        <polygon
+        points="1.4 1.1, 2.8 2.0, 1.4 2.9"
+        fill={COLORS.minesLightBlue}
+        />
+    </marker>
+    </defs>
+
+        {/* CPU */}
+        <rect
+        x="40"
+        y="90"
+        width="610"
+        height="290"
+        fill={COLORS.minesDarkBlue}
+        stroke="black"
+        />
+
+        <text x="360" y="80" textAnchor="middle" fontSize="20">
+        CPU
+        </text>
+
+        {/* Control Unit */}
+        {/* <rect
+        x="520"
+        y="210"
+        width="110"
+        height="50"
+        fill={
+            currentStep.activeBlocks.includes("Control Unit")
+            ? "#FFD54F"
+            : "#DDEEFF"
+        }
+        stroke="black"
+        />
+
+        <text x="200" y="145" textAnchor="middle">
+        Control Unit
+        </text> */}
+
+        {/* ALU */}
+        {/* <rect
+        x="205"
+        y="110"
+        width="110"
+        height="250"
+        fill={
+            currentStep.activeBlocks.includes("ALU")
+            ? COLORS.active
+            : "#DDB556"
+        }
+        stroke="black"
+        /> */}
+
+        {/* <text x="260" y="245" textAnchor="middle">
+        ALU
+        </text> */}
+
+        {/* Memory Background*/}
+        <rect
+            x="740"
+            y="90"
+            width="150"
+            height="290"
+            fill={COLORS.minesDarkBlue}
+            stroke="black"
+        />
+        
+        {/* Draw the Low Layer Control Connections*/}
+        {controlConnections
+            .filter(conn => conn.layer === "low")
+            .map(RenderControlConnection)}
+
+        {/* Draw the Low Layer Data Connections*/}
+        {connections
+            .filter(conn => conn.layer === "low")
+            .map(RenderConnection)}
+
+
+        {/* Draw the Components*/}
+        {Object.entries(components).map(([id, comp]) => (
+        <g key={id}>
+            <rect
+            x={comp.x}
+            y={comp.y}
+            width={comp.w}
+            height={comp.h}
+            fill={
+                isActive(id)
+                ? COLORS.active
+                : (comp.fill ?? COLORS.white)
+            }
+            stroke="black"
+            />
+
+            <text
+            x={comp.x + comp.w / 2}
+            y={comp.y + comp.h / 2 + 5}
+            textAnchor="middle"
+            >
+            {comp.label.split("\n").map((line, i) => (
+                <tspan
+                key={i}
+                x={comp.x + comp.w / 2}
+                dy={i === 0 ? 0 : "1.2em"}
+                >
+                {line}
+                </tspan>
+            ))}
+            </text>
+        </g>
+        ))}
+
+        {/* ACC Input Mux */}
+        <polygon
+            points ="445,120 470,105 470,120 455,130 470,140 470,155 445,140"
+            fill={COLORS.minesLightBlue} />
+
+        {/* Data Bus */}
+        <line
+            x1="630"
+            y1="135"
+            x2="760"
+            y2="135"
+            stroke={COLORS.minesLightBlue}
+            strokeWidth="20"
+            markerEnd="url(#arrowhead)"
+            markerStart="url(#arrowhead)"
+        />
+
+        {/* Control Bus */}
+        <line
+            x1="630"
+            y1="235"
+            x2="760"
+            y2="235"
+            stroke={COLORS.minesLightBlue}
+            strokeWidth="20"
+            markerEnd="url(#arrowhead)"
+        />
+
+        {/* Address Bus */}
+        <line
+            x1="630"
+            y1="335"
+            x2="760"
+            y2="335"
+            stroke={COLORS.minesLightBlue}
+            strokeWidth="20"
+            markerEnd="url(#arrowhead)"
+        />
+        {/* Draw the high Layer Control Connections*/}
+        {controlConnections
+            .filter(conn => conn.layer === "high")
+            .map(RenderControlConnection)}
+
+        {/* Draw the high Layer Data Connections*/}
+        {connections
+            .filter(conn => conn.layer === "high")
+            .map(RenderConnection)}
+
+        
+        <text x="695" y="137" textAnchor="middle" dominantBaseline="middle">
+            Data Bus
+        </text>
+        <text x="695" y="237" textAnchor="middle" dominantBaseline="middle">
+            Control Bus
+        </text>
+        <text x="695" y="337" textAnchor="middle" dominantBaseline="middle">
+            Address Bus
+        </text>
+
+        {/* Animate a moving pulse */}
+        {endpoints && (
+            <circle
+            cx={
+                endpoints.x1 +
+                phase *
+                (endpoints.x2 -
+                endpoints.x1)
+            }
+            cy={
+                endpoints.y1 +
+                phase *
+                (endpoints.y2 -
+                endpoints.y1)
+            }
+            r="8"
+            fill={COLORS.active}
+            />
+        )}
+    </svg>
+    );
+}
