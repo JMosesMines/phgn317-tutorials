@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo} from "react";
 import {
   COLORS,
   components,
@@ -28,7 +28,7 @@ export default function CpuDiagram({currentStep}) {
         from === currentStep.source &&
         to === currentStep.destination
     );
-    function getEndpoints(conn) {
+   function getEndpoints(conn) {
     // const left = components[from];
     // const right = components[to];
 
@@ -37,7 +37,7 @@ export default function CpuDiagram({currentStep}) {
 
     const fromComp = components[conn.from];
     const toComp = components[conn.to];
-    let y1, y2;
+    let x1, x2, y1, y2;
     if ("anchor" in conn){
         const anchorComp = components[conn.anchor];
         y1 = anchorComp.y + anchorComp.h / 2;
@@ -46,28 +46,31 @@ export default function CpuDiagram({currentStep}) {
         y1 = fromComp.y + fromComp.h / 2;
         y2 = toComp.y + toComp.h / 2; 
     }
+    if ( conn.fromSide === "left"){
+        x1 = fromComp.x;
+    } else if ( conn.fromSide === "right"){
+        x1 = fromComp.x + fromComp.w;
+    } else 
+        x1 = fromComp.x + fromComp.w / 2;
 
-    return {
-    x1:
-    conn.fromSide === "left"
-        ? fromComp.x
-        : conn.fromSide === "right"
-        ? fromComp.x + fromComp.w
-        : fromComp.x + fromComp.w / 2,
-      y1: y1,
-    x2:
-    conn.toSide === "left"
-        ? toComp.x
-        : conn.toSide === "right"
-        ? toComp.x + toComp.w
-        : toComp.x + toComp.w / 2,
-          y2: y2,
-    };}
+    if ( conn.toSide === "left"){
+        x2 = toComp.x;
+    } else if ( conn.toSide === "right" ){
+        x2 = toComp.x + toComp.w;
+    } else {
+        x2 = toComp.x + toComp.w / 2;
+    }
+
+    return [{x:x1,y:y1},{x:x2,y:y2}];}
     
     const endpoints =
         activeConnection &&
         getEndpoints(activeConnection)
-  
+
+    const polylinePoints =
+        activeConnection &&
+        activeConnection.path
+        
   function isActive(blockName) {
     return currentStep.activeBlocks.includes(blockName);
   }
@@ -97,18 +100,40 @@ export default function CpuDiagram({currentStep}) {
       currentStep.source === source &&
       currentStep.destination === destination
     );}
-  function RenderConnection(conn, index){
-    const p = getEndpoints(conn);
-    if (conn.path){
-        return(
+  
+  
+function RenderConnection({conn, phase}){
+    
+    // console.log('Conn received:', conn, 'Path:', conn?.path);
+    
+    const path = useMemo(() => {
+        return conn?.path || getEndpoints(conn) || [];
+    }, [conn]);
+    
+    //console.log ('Path:', path);
+    const active = isConnectionActive(conn);
+
+    // 1. Format points string for polyline
+    const pointsString = useMemo(() => {
+        if (!path.length) return '';
+        return path.map((p) => `${p.x},${p.y}`).join(' ');
+    }, [path]);
+
+    // 2. Calculate pulse position only when active
+    const pulsePos = useMemo(() => {
+        if (!active || path.length < 2) return null;
+        return getPointAtPolylinePhase(path, phase);
+    }, [path, phase, active]);
+
+    // Early return if no valid path exists
+    if (!path.length) return null;
+    
+       return(
+            <g>
             <polyline
-                key={`ctrl-${index}`}
-                points={conn.path
-                    .map(p => `${p.x},${p.y}`)
-                    .join(" ")}
+                points={pointsString}
                 fill="none"
-                stroke={
-                isConnectionActive(conn)
+                stroke={active
                     ? COLORS.active
                     : COLORS.minesLightBlue
                 }
@@ -117,34 +142,46 @@ export default function CpuDiagram({currentStep}) {
                     ? 6
                     : 3
                 }
-            /> );
-        }
-        return(
-            <line
-                key={index}
-                // x1={conn.x1}
-                // y1={conn.y1}
-                // x2={conn.x2}
-                // y2={conn.y2}
-                // x1={components[conn.from].x + components[conn.from].w /2}
-                // y1={components[conn.from].y + components[conn.from].h /2}
-                // x2={components[conn.to].x + components[conn.to].w /2}
-                // y2={components[conn.to].y + components[conn.to].h /2}
-                x1={p.x1}
-                y1={p.y1}
-                x2={p.x2}
-                y2={p.y2}
-                stroke={
-                isConnectionActive(conn)
-                    ? COLORS.active
-                    : COLORS.minesLightBlue
-                }
-                strokeWidth={
-                isConnectionActive(conn)
-                    ? 6
-                    : 3
-                }
-            />);    
+            /> 
+{/* Pulse Circle (Active Only) */}
+      {active && pulsePos && (
+        <circle
+          cx={pulsePos.x}
+          cy={pulsePos.y}
+          r="8"
+          fill={COLORS.active}
+        />
+        )}
+        </g>
+        
+        );
+
+        // return(
+        //     <line
+        //         // key={index}
+        //         // x1={conn.x1}
+        //         // y1={conn.y1}
+        //         // x2={conn.x2}
+        //         // y2={conn.y2}
+        //         // x1={components[conn.from].x + components[conn.from].w /2}
+        //         // y1={components[conn.from].y + components[conn.from].h /2}
+        //         // x2={components[conn.to].x + components[conn.to].w /2}
+        //         // y2={components[conn.to].y + components[conn.to].h /2}
+        //         x1={p.x1}
+        //         y1={p.y1}
+        //         x2={p.x2}
+        //         y2={p.y2}
+        //         stroke={
+        //         isConnectionActive(conn)
+        //             ? COLORS.active
+        //             : COLORS.minesLightBlue
+        //         }
+        //         strokeWidth={
+        //         isConnectionActive(conn)
+        //             ? 6
+        //             : 3
+        //         }
+        //     />);    
         }
   function RenderControlConnection(conn, index){
             if(conn.path){
@@ -171,6 +208,50 @@ export default function CpuDiagram({currentStep}) {
                         opacity={isControlConnectionActive(conn) ? 1.0 : 0.4}
                     />);
             }
+
+    function getPointAtPolylinePhase(points, phase) {
+    if (!points || points.length === 0) return { x: 0, y: 0 };
+    if (points.length === 1) return points[0];
+
+    // 1. Calculate lengths of each segment and total polyline length
+    const segmentLengths = [];
+    let totalLength = 0;
+
+    for (let i = 0; i < points.length - 1; i++) {
+        const dx = points[i + 1].x - points[i].x;
+        const dy = points[i + 1].y - points[i].y;
+        const dist = Math.hypot(dx, dy);
+        segmentLengths.push(dist);
+        totalLength += dist;
+    }
+
+    if (totalLength === 0) return points[0];
+
+    // 2. Find target distance based on phase
+    const targetDist = phase * totalLength;
+
+    // 3. Find which segment targetDist falls into
+    let accumulated = 0;
+    for (let i = 0; i < segmentLengths.length; i++) {
+        const segLen = segmentLengths[i];
+
+        if (accumulated + segLen >= targetDist || i === segmentLengths.length - 1) {
+        const segmentPhase = segLen === 0 ? 0 : (targetDist - accumulated) / segLen;
+        const p1 = points[i];
+        const p2 = points[i + 1];
+
+        return {
+            x: p1.x + segmentPhase * (p2.x - p1.x),
+            y: p1.y + segmentPhase * (p2.y - p1.y),
+        };
+        }
+        accumulated += segLen;
+    }
+
+    return points[points.length - 1];
+    }
+
+
 //   function getSignalClass(signal) {
 //     return (
 //         (signal.endsWith("_OUT") ? "readEnable" : 
@@ -267,7 +348,13 @@ export default function CpuDiagram({currentStep}) {
         {/* Draw the Low Layer Data Connections*/}
         {connections
             .filter(conn => conn.layer === "low")
-            .map(RenderConnection)}
+            .map((conn, index) => (
+                <RenderConnection
+                    key={conn.id || `conn-${index}`}
+                    conn={conn}
+                    phase={phase}
+                />
+            ))}
 
 
         {/* Draw the Components*/}
@@ -350,8 +437,13 @@ export default function CpuDiagram({currentStep}) {
         {/* Draw the high Layer Data Connections*/}
         {connections
             .filter(conn => conn.layer === "high")
-            .map(RenderConnection)}
-
+            .map((conn, index) => (
+                <RenderConnection
+                    key={conn.id || `conn-${index}`}
+                    conn={conn}
+                    phase={phase}
+                />
+            ))}
         
         <text x="695" y="137" textAnchor="middle" dominantBaseline="middle">
             Data Bus
@@ -364,7 +456,7 @@ export default function CpuDiagram({currentStep}) {
         </text>
 
         {/* Animate a moving pulse */}
-        {endpoints && (
+        {/* {endpoints && (
             <circle
             cx={
                 endpoints.x1 +
@@ -381,7 +473,30 @@ export default function CpuDiagram({currentStep}) {
             r="8"
             fill={COLORS.active}
             />
-        )}
+        )} */}
+
+        {/* {polylinePoints && polylinePoints.length > 0 && (() => {
+        const currentPos = getPointAtPolylinePhase(polylinePoints, phase);
+
+        return (
+            <circle
+            cx={currentPos.x}
+            cy={currentPos.y}
+            r="8"
+            fill={COLORS.active}
+            />
+        );
+        }
+        )()} */}
+
+    {/* {activePaths.map((path) => (
+        <PolylinePulse
+          key={path.id}
+          points={path.points}
+          phase={path.phase}
+        />
+      ))}         */}
+
     </svg>
     );
 }

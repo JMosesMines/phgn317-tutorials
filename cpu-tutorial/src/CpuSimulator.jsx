@@ -1,15 +1,7 @@
-// import React from 'react';
-import { createRoot } from 'react-dom/client';
 import { useState, useEffect } from "react";
 import CpuDiagram, {getSignalColor} from "./CpuDiagram";
 import { commonSteps, INSTRUCTION_MICROCODE, PROGRAM} from "./cpuSteps";
 import { legend, COLORS} from "./cpuConstants";
-
-const container = document.getElementById('CPU');
-const root = createRoot(container);
-
-// 2. Render your imported App component
-root.render(<App />);
 
 function App() {
   

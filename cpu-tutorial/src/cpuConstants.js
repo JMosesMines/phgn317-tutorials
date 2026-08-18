@@ -68,11 +68,12 @@ export const connections = [
     //   path: [{x:470, y:235}, {x:520, y:235}]
     // },
     {from: "MAR", to: "MEM", fromSide: "right", toSide: "left", layer: "high", anchor: "MAR"},
-    // {from: "MDR", to: "MEM", fromSide: "right", toSide: "left", layer: "high"},
+    {from: "MDR", to: "MEM", fromSide: "right", toSide: "left", layer: "high", anchor: "MDR"},
     {from: "MEM", to: "MDR", fromSide: "left", toSide: "right", layer: "high", anchor: "MDR"},
     {from: "ACC", to: "ALU", fromSide: "left", toSide: "right", layer: "low", anchor: "ACC"},
     {from: "PC", to: "MAR", layer: "low", anchor: "PC"},
     {from: "IR", to: "CU", layer: "low", anchor: "IR"},
+    {from: "IR", to: "ALU", layer: "low", anchor: "IR"},
     // {from: "ACC", to: "MDR", layer: "low", anchor: "ACC"},
     // {from: "MDR", to: "ACC", layer: "low", anchor: "ACC"},
 //    {
@@ -85,25 +86,25 @@ export const connections = [
 //         path: [{x:270, y:335}, {x:620, y:335}],
 //         layer: "low"
 //         },
-    {
-        from: "IR",
-        to: "ALU",
-        // x1: 315,
-        // y1: 235,
-        // x2: 360,
-        // y2: 235,
-        layer: "low",
-        anchor: "IR"
-    },
-    {
-        from: "REGS",
-        to: "ALU",
-        // x1: 170,
-        // y1: 185,
-        // x2: 205,
-        // y2: 185,
-        layer: "low"
-    },
+    // {
+    //     from: "IR",
+    //     to: "ALU",
+    //     // x1: 315,
+    //     // y1: 235,
+    //     // x2: 360,
+    //     // y2: 235,
+    //     layer: "low",
+    //     anchor: "IR"
+    // },
+    // {
+    //     from: "REGS",
+    //     to: "ALU",
+    //     // x1: 170,
+    //     // y1: 185,
+    //     // x2: 205,
+    //     // y2: 185,
+    //     layer: "low"
+    // },
     // {
     //     from: "ACC",
     //     to: "ALU",
@@ -193,7 +194,7 @@ export const connections = [
         ],
         layer: "high"
     },
-        {
+    {
         from: "MDR", to: "ACC",
         path: [
                 {x:530, y:135},
@@ -202,6 +203,18 @@ export const connections = [
                 {x:470, y:112},
                 {x:445, y:130},
                 {x:430, y:130}
+        ],
+        layer: "high"
+    },
+    {
+        from: "ACC", to: "MDR",
+        path: [
+                {x:430, y:130},
+                {x:445, y:130},
+                {x:470, y:112},
+                {x:500, y:112},
+                {x:500, y:135},
+                {x:530, y:135}
         ],
         layer: "high"
     },

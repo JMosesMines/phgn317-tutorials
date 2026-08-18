@@ -199,7 +199,7 @@ export const INSTRUCTION_MICROCODE = {
   "LD HL, nn": [
     {
       name: "Immediate Load",
-      description: "Load immediate 16-bit address into HL register pair.",
+      description: "Load immediate 16-bit address into High & Low register pair.",
       activeBlocks: ["IR", "HL"],
       activeConnections: [["IR", "HL"]],
       activeSignals: ["IR_OUT", "HL_IN"],
@@ -211,7 +211,7 @@ export const INSTRUCTION_MICROCODE = {
   "ADD A, (HL)": [
     {
       name: "Address Setup",
-      description: "Drive MAR with memory pointer stored in HL.",
+      description: "Drive MAR with memory pointer stored in H&L pair.",
       activeBlocks: ["HL","MAR"],
       activeConnections: [["HL", "MAR"]],
       activeSignals: ["HL_OUT", "MAR_IN"],
@@ -238,39 +238,47 @@ export const INSTRUCTION_MICROCODE = {
     },
     {
       name: "ALU Execution",
-      description: "Feed A and MDR into ALU, compute sum, and latch into Accumulator ACC.",
-      activeBlocks: ["ACC", "MDR", "ALU"],
-      activeConnections: [["ALU", "ACC"],["ACC", "ALU"],["MDR","ALU"]],
-      activeSignals: ["MDR_OUT", "ACC_IN", "ACC_OUT", "ALU"]
+      description: "Feed ACC and MDR into ALU, compute sum, and latch into Accumulator ACC.",
+      activeBlocks: ["ACC", "MDR", "ALU", "IR"],
+      activeConnections: [["ALU", "ACC"],["ACC", "ALU"],["MDR","ALU"],["IR","ALU"]],
+      activeSignals: ["MDR_OUT", "ACC_IN", "ACC_OUT", "IR_OUT", "ALU"],
+      source: "ALU",
+      destination: "ACC"
     }
    ],
 
-//   "LD (nn), A": [
-//     {
-//       name: "Memory Write Setup",
-//       description: "Copy target address to MAR and Accumulator contents to MDR.",
-//       readEnable: ["IR_OPERAND", "A"],
-//       writeEnable: ["MAR", "MDR"],
-//       controlSignals: ["BUS_CONNECT"]
-//     },
-//     {
-//       name: "Memory Write",
-//       description: "Assert write signal to transfer MDR value to RAM address in MAR.",
-//       readEnable: ["MDR"],
-//       writeEnable: ["RAM"],
-//       controlSignals: ["MEM_WRITE"]
-//     }
-//   ],
+  "LD (nn), A": [
+    {
+      name: "Memory Write Setup",
+      description: "Copy target address to MAR and Accumulator contents to MDR.",
+      activeBlocks: ["ACC", "IR", "MAR", "MDR"],
+      activeConnections: [["ACC", "MDR"], ["IR", "MAR"]],
+      activeSignals: ["ACC_OUT", "MDR_IN", "IR_OUT", "MAR_IN"],  
+    },
+    {
+      name: "Memory Write",
+      description: "Assert write signal to transfer MDR value to RAM address in MAR.",
+      activeBlocks: ["MAR", "MDR", "MEM"],
+      activeConnections: [["MAR", "MEM"], ["MDR", "MEM"]],
+      activeSignals: ["MAR_OUT", "MDR_OUT", "MEM_IN"],
+      readEnable: ["MDR"],
+      writeEnable: ["RAM"],
+      controlSignals: ["MEM_WRITE"]
+    }
+  ],
 
-//   "HALT": [
-//     {
-//       name: "Control",
-//       description: "Assert HALT signal to disable the CPU clock generator.",
-//       readEnable: [],
-//       writeEnable: [],
-//       controlSignals: ["CPU_HALT"]
-//     }
-//   ]
+  "HALT": [
+    {
+      name: "End",
+      description: "End",
+      activeBlocks: [],
+      activeConnections: [],
+      activeSignals: [],
+      readEnable: [],
+      writeEnable: [],
+      controlSignals: []
+    }
+  ]
 };
 
 export const PROGRAM = [
@@ -289,15 +297,15 @@ export const PROGRAM = [
     opcode: "ADD A, (HL)",
     operand: null
   },
-//   {
-//     instruction: "LD (0x2002), A",
-//     opcode: "LD (nn), A",
-//     operand: "0x2002"
-//   },
-//   {
-//     instruction: "HALT",
-//     opcode: "HALT",
-//     operand: null
-//   }
+  {
+    instruction: "LD (0x2002), A",
+    opcode: "LD (nn), A",
+    operand: "0x2002"
+  },
+  {
+    instruction: "HALT",
+    opcode: "HALT",
+    operand: null
+  }
 ];
 
